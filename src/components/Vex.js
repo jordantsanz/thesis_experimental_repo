@@ -3,7 +3,6 @@
 /* eslint-disable react/no-unused-state */
 /* eslint-disable new-cap */
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
 import Vex from 'vexflow';
 // eslint-disable-next-line no-unused-vars
 
@@ -49,7 +48,6 @@ class VexNotes extends Component {
   }
 
   renderVexFlow = (json) => {
-    console.log('rerendering vexflow in vex');
     // remove everything all pre-existing taves
     console.log('this props are ', this.props);
     const node = document.getElementById(this.props.divId);
@@ -187,6 +185,7 @@ class VexNotes extends Component {
     2. Ties array
   */
   processJsonNotes = (json) => {
+    console.log({ json });
     let jsonNotes = json;
     if (jsonNotes === undefined || jsonNotes === null || jsonNotes.length < this.state.jsonNotes.length) {
       jsonNotes = this.state.jsonNotes;
@@ -784,10 +783,4 @@ class VexNotes extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    authentication: state.auth.authentication,
-  };
-}
-
-export default connect(mapStateToProps, { })(VexNotes);
+export default VexNotes;

@@ -2,6 +2,11 @@
   "name": "warbler",
   "version": "1.0.0",
   "main": "src/index.js",
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "repository": "https://github.com/dartmouth-cs98/Warbler-Frontend.git",
   "contributors": [
     {

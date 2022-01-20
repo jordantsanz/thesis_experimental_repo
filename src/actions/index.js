@@ -1,14 +1,15 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable eqeqeq */
 import axios from 'axios';
+// const ROOT_URL = 'https://warblermusic.herokuapp.com/api';
+// const ROOT_URL = 'https://warbler-ic-server.herokuapp.com/';
+
+import { generateRhythmActivity } from '../components/Random';
 // eslint-disable-next-line no-unused-vars
 // import { generateRandomActivity } from '../components/published_components/lesson_creation_components/RandomActivityGenerator';
 // root url for local: change to #####-heroku.com/api
 // const ROOT_URL = 'https://aptitune-api.herokuapp.com/api';
-// const ROOT_URL = 'http://localhost:9090/api';
-const ROOT_URL = 'https://warblermusic.herokuapp.com/api';
-// const ROOT_URL = 'https://warbler-ic-server.herokuapp.com/';
-
+const ROOT_URL = 'http://localhost:9090/api';
 // action types
 export const ActionTypes = {
   BETA_AUTH: 'BETA_AUTH',
@@ -48,7 +49,8 @@ export const ActionTypes = {
   UPDATE_COMPLETED_LESSONS: 'UPDATE_COMPLETED_LESSONS',
   UNSELECT_CLASS: 'UNSELECT_CLASS',
   CLEAR_LESSONMAKING: 'CLEAR_LESSONMAKING',
-  SET_RHYTHM_ACTIVITY: 'SET_RHYTHM_ACTIVITY',
+  GO_TO_NEXT: 'GO_TO_NEXT',
+  SET_ALL_QUESTIONS: 'SET_ALL_QUESTIONS',
 };
 
 // Remaking of lesson stuff.
@@ -465,6 +467,23 @@ export function registerLessonCompletion(lessonID, userID) {
       console.log('response in register completed lesson is: ', response);
       dispatch({ type: ActionTypes.UPDATE_COMPLETED_LESSONS, payload: { completed_lessons: response.data } });
     });
+  };
+}
+
+export function getRandomLesson(history, types, clef) {
+  // call createRandomActivity 100 times and store in []
+  console.log('getRandomLesson called');
+  const arr = [];
+  for (let i = 0; i < 100; i += 1) {
+    arr.push(generateRhythmActivity(1, 'easy'));
+  }
+  const json = { pages: arr, title: 'random' };
+  console.log('json created,', json);
+
+  return (dispatch) => {
+    console.log('dispatch run');
+    dispatch({ type: ActionTypes.GET_LESSON, payload: json });
+    history.push('/lessons/random');
   };
 }
 

@@ -3,7 +3,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getUserInfo } from '../actions';
-import RhythmWrapper from './RhythmWrapper';
+// import RhythmWrapper from './RhythmWrapper';
+import Lesson from './Lesson';
 
 const App = (props) => {
   const token = localStorage.getItem('token');
@@ -14,7 +15,7 @@ const App = (props) => {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={RhythmWrapper} />
+        <Route path="/" component={Lesson} />
       </Switch>
     </Router>
   );

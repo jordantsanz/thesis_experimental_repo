@@ -201,7 +201,7 @@ function generateRhythmDurations(timeSignature, difficulty) {
   return durations;
 }
 
-export default function generateRhythmActivity(i, difficulty) {
+export default async function generateRhythmActivity(i, difficulty) {
   // console.log('generateRhythmActivity called');
   /*
       Inputs:
@@ -222,7 +222,8 @@ export default function generateRhythmActivity(i, difficulty) {
           }
       }
     */
-
+  //   const questions = [];
+  //   for (let i = 1; i < numberOfQuestions + 1; i += 1) {
   const timeSignature = generateTimeSignature();
   // console.log('timeSignature', timeSignature);
   const durations = generateRhythmDurations(timeSignature, difficulty);
@@ -245,6 +246,9 @@ export default function generateRhythmActivity(i, difficulty) {
       },
     },
   };
+
+  // questions.push(output);
+  //   }
 
   return output;
 }

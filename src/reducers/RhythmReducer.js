@@ -1,16 +1,23 @@
 import { ActionTypes } from '../actions';
 
 const initialState = {
-  activity: {},
+  currentPageNumber: 0,
+  pages: [],
 };
 
 const RhythmReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ActionTypes.SET_RHYTHM_ACTIVITY:
-      console.log('helloooo');
+    case ActionTypes.GO_TO_NEXT:
+      console.log('changed');
       return {
         ...state,
-        activity: action.payload,
+        currentPageNumber: action.payload,
+      };
+    case ActionTypes.SET_ALL_QUESTIONS:
+      return {
+        ...state,
+        pages: action.payload,
+        currentPageNumber: 0,
       };
     default:
       return state;
