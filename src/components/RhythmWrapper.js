@@ -22,7 +22,7 @@ const RhythmWrapper = () => {
     return (
       <button type="button"
         onClick={() => {
-          generateRandomActivity(1, difficulties.EASY).then((question) => {
+          generateRandomActivity(6, difficulties.EASY).then((question) => {
             dispatch({ type: ActionTypes.MAKE_QUESTION, payload: question });
           });
         }}

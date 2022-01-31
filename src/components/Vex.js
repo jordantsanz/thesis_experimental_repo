@@ -49,7 +49,6 @@ class VexNotes extends Component {
 
   renderVexFlow = (json) => {
     // remove everything all pre-existing taves
-    console.log('this props are ', this.props);
     const node = document.getElementById(this.props.divId);
     node.querySelectorAll('*').forEach((n) => n.remove());
 
@@ -60,7 +59,6 @@ class VexNotes extends Component {
     const arr = this.processJsonNotes(jsonNotes);
     let measures = arr[0];
     const ties = arr[1];
-    console.log('ties', ties);
     measures = this.setNoteColors(measures, ties);
 
     if (this.props.mode === 'sightreading') {
@@ -73,16 +71,12 @@ class VexNotes extends Component {
       // adds event listeners to notes
       this.addListeners(measures);
     } else {
-      console.log('TICKCHECK FAILED');
       this.setState({ error: true });
     }
   }
 
   setNoteColors = (measures, ties) => {
-    console.log('setting note colors', this.props.correctnessArray);
-    console.log(this.props.correctnessArray);
     if (this.props.mode === 'rhythm' && this.props.correctnessArray !== undefined && this.props.correctnessArray !== null) {
-      console.log('in if');
       let noteCount = 0;
       // loop through each measure
       let tieColor = null;
@@ -102,7 +96,6 @@ class VexNotes extends Component {
               if (this.props.correctnessArray[noteCount] === 1) {
                 note.setStyle({ fillStyle: 'green', strokeStyle: 'green' });
                 if (hasTie) {
-                  console.log('hasTie');
                   tieColor = 'green';
                 } else {
                   tieColor = null;
@@ -110,7 +103,6 @@ class VexNotes extends Component {
               } else if (this.props.correctnessArray[noteCount] === 0) {
                 note.setStyle({ fillStyle: 'red', strokeStyle: 'red' });
                 if (hasTie) {
-                  console.log('hasTie');
                   tieColor = 'red';
                 } else {
                   tieColor = null;
@@ -143,10 +135,8 @@ class VexNotes extends Component {
 
   isRest = (note) => {
     if (note.customTypes.length > 0 && note.customTypes[0] === 'r') {
-      console.log('note', note.duration, 'is a rest');
       return true;
     } else {
-      console.log('note', note.duration, 'is not a rest');
       return false;
     }
   }
@@ -163,7 +153,6 @@ class VexNotes extends Component {
  }
 
   readNotesFromProps = () => {
-    console.log('readNotesFromProps called');
     // const staveNotes = [];
     const jsonNotes = [];
     // const ties = [];
@@ -173,7 +162,6 @@ class VexNotes extends Component {
       i += 1;
     }
     this.setState({ jsonNotes });
-    console.log('reading notes from props returning', jsonNotes);
     return jsonNotes;
   }
 
@@ -184,7 +172,6 @@ class VexNotes extends Component {
     2. Ties array
   */
   processJsonNotes = (json) => {
-    console.log({ json });
     let jsonNotes = json;
     if (jsonNotes === undefined || jsonNotes === null || jsonNotes.length < this.state.jsonNotes.length) {
       jsonNotes = this.state.jsonNotes;
@@ -198,7 +185,6 @@ class VexNotes extends Component {
     const bpm = arr[0];
     const beatValue = arr[1];
     const timePerMeasure = bpm * beatValue;
-    console.log('timePerMeasure', timePerMeasure);
     let beatCount = 0;
     let staveNote = null;
     let previous = null;
@@ -207,9 +193,7 @@ class VexNotes extends Component {
       const note = jsonNotes[i];
       const duration = note.duration;
       beatCount += this.getNoteDurationAsNumber(duration, beatValue);
-      console.log('note', i, ' - measure', measures.length, '- beatCount: ', beatCount);
       if (beatCount < timePerMeasure) {
-        console.log('measure incomplete');
         // measure incomplete
         staveNote = new Vex.Flow.StaveNote({ clef: this.props.clef, keys: note.keys, duration });
         measureNotes.push(staveNote);
@@ -221,7 +205,6 @@ class VexNotes extends Component {
         staveNotes.push(staveNote);
       } else if (beatCount === timePerMeasure) {
         // measure complete
-        console.log('measure complete');
         staveNote = new Vex.Flow.StaveNote({ clef: this.props.clef, keys: note.keys, duration });
         measureNotes.push(staveNote);
         measures.push(measureNotes);
@@ -234,16 +217,12 @@ class VexNotes extends Component {
         previous = staveNote;
         staveNotes.push(staveNote);
       } else if (beatCount > timePerMeasure) {
-        console.log('too many beats in measure');
         const lastNoteDuration = this.getNoteDurationAsNumber(duration, beatValue);
-        console.log('lastNoteDuration', lastNoteDuration);
         const difference = timePerMeasure - (beatCount - lastNoteDuration); // time left in first measure
-        console.log('beatCount: ', beatCount, 'difference: ', difference);
 
         // split up note into two measures
 
         // note in previous measure
-        console.log('calling createStaveNote');
         [measureNotes, ties, staveNote, staveNotes] = this.createStaveNote(note.keys, difference, ties, measureNotes, staveNotes, false);
         measures.push(measureNotes);
         previous = staveNote;
@@ -252,12 +231,9 @@ class VexNotes extends Component {
         // note in next measure
         measureNotes = [];
         beatCount -= timePerMeasure;
-        console.log('beatCount going into second half of note', beatCount);
         [measureNotes, ties, staveNote, staveNotes] = this.createStaveNote(note.keys, beatCount, ties, measureNotes, staveNotes, false);
 
         // tie them together
-        // eslint-disable-next-line react/no-access-state-in-setstate
-        console.log('adding tie with', firstNote, staveNote);
         ties.push(
           new Vex.Flow.StaveTie({
             first_note: firstNote,
@@ -270,31 +246,24 @@ class VexNotes extends Component {
         staveNotes.push(firstNote);
         staveNotes.push(staveNote);
       }
-      console.log('previous: ', previous);
     }
 
     if (measureNotes.length !== 0) {
-      console.log('cleaning up stragglers: ', measureNotes);
-      console.log('beatCount before adding trailing rests', beatCount);
       while (beatCount < timePerMeasure) {
         let duration = this.getNoteCode(timePerMeasure - beatCount, 'rest');
         if (duration === null) {
           duration = this.getClosestNoteCode(timePerMeasure - beatCount, 'rest');
         }
-        console.log('adding rest w value', timePerMeasure - beatCount);
         const rest = new Vex.Flow.StaveNote({ clef: this.props.clef, keys: [this.getKeyOfRest()], duration });
         this.addDots(rest, duration);
         beatCount += this.getNoteDurationAsNumber(duration, beatValue);
-        console.log('final beatCount: ', beatCount);
         measureNotes.push(rest);
       }
-      console.log('last measure:', measureNotes);
       measures.push(measureNotes);
       measureNotes = [];
     }
 
     this.setState({ measures });
-    console.log('staveNotes.length', staveNotes.length);
     return [measures, ties];
   }
 
@@ -303,8 +272,6 @@ class VexNotes extends Component {
     if (notesArray === null || notesArray === undefined) {
       measures = this.state.notes;
     }
-
-    console.log('tiesArray:', tiesArray);
     let ties = tiesArray;
     if (ties === null || ties === undefined || ties.length < this.state.ties.length) {
       ties = this.state.ties;
@@ -314,7 +281,6 @@ class VexNotes extends Component {
     const bpm = arr[0];
     const beatCount = arr[2];
 
-    console.log('renderNotes called again with notes', measures);
     const firstMeasureWidth = this.getFirstMeasureWidth(measures[0], this.props.keySignature);
     const VF = Vex.Flow;
     const div = document.getElementById(this.props.divId);
@@ -341,16 +307,12 @@ class VexNotes extends Component {
     let newLine = true;
     let measureNotes = [];
     let i = 0;
-    console.log('rendering notes: ', measures);
     for (i; i < measures.length; i += 1) {
       measureNotes = measures[i];
       const measureWidth = this.getMeasureWidth(measureNotes);
-      console.log('rendering measure', i, 'with xLocation:', xLocation, 'and yLocation', yLocation);
 
       if (newLine && i === 0) {
-        console.log('rendering stave', i);
         const voice = new VF.Voice({ num_beats: bpm, beat_value: beatCount });
-        console.log('voice:', voice.totalTicks);
         // .setMode(Vex.Flow.Voice.Mode.SOFT)
         voice.addTickables(measureNotes);
 
@@ -373,12 +335,10 @@ class VexNotes extends Component {
 
         if (newLine) {
           staveMeasure = new VF.Stave(xLocation, yLocation, firstMeasureWidth);
-          console.log('adding clef');
           staveMeasure.addClef(this.props.clef).addKeySignature(this.props.keySignature);
           newLine = false;
         }
         const voice = new VF.Voice({ num_beats: bpm, beat_value: beatCount });
-        console.log('voice:', voice.totalTicks);
         // .setMode(Vex.Flow.Voice.Mode.SOFT)
         voice.addTickables(measureNotes);
 
@@ -387,7 +347,6 @@ class VexNotes extends Component {
         // eslint-disable-next-line no-unused-vars
         const formatter = new VF.Formatter().joinVoices([voice]).format([voice], measureWidth);
 
-        console.log('rendering stave', i);
         // Render voice
         voice.draw(context, staveMeasure);
         xLocation += measureWidth;
@@ -398,9 +357,8 @@ class VexNotes extends Component {
         }
       }
     }
-    console.log('ties:', ties);
+
     ties.forEach((t) => {
-      console.log('first note', t.first_note);
       t.setContext(context).draw();
     });
   }
@@ -423,17 +381,14 @@ class VexNotes extends Component {
       return [width, this.state.rowHeight];
     } else {
       const rowCount = Math.ceil(this.state.maxWidth / width) + 1;
-      console.log('rowCount', rowCount);
       this.props.setMeasureCount(3);
       const dimensions = [this.state.maxWidth, rowCount * this.state.rowHeight];
-      console.log('getWindowDimensions returning', dimensions);
       return dimensions;
     }
   }
 
   /* takes keys, duration --> and splits it into as many notes as need be */
   createStaveNote = (keys, dur, tieArray, mNotes, sNotes, rest) => {
-    console.log('createStaveNote called with dur', dur);
     const measureNotes = mNotes;
     const staveNotes = sNotes;
     let totalDuration = 0;
@@ -443,7 +398,7 @@ class VexNotes extends Component {
     if (rest) {
       type = 'rest';
     }
-    let i = 0;
+    // let i = 0;
     let staveNote = null;
 
     while (totalDuration < dur) {
@@ -451,7 +406,6 @@ class VexNotes extends Component {
       if (noteDuration === null) {
         noteDuration = this.getClosestNoteCode(dur, type);
       }
-      console.log('noteDuration:', noteDuration);
       totalDuration += this.getNoteDurationAsNumber(noteDuration);
       staveNote = new Vex.Flow.StaveNote({ clef: this.props.clef, keys, duration: noteDuration });
       this.addDots(staveNote, noteDuration);
@@ -463,15 +417,12 @@ class VexNotes extends Component {
       previous = staveNote;
       measureNotes.push(staveNote);
       staveNotes.push(staveNote);
-      i += 1;
+      // i += 1;
     }
-
-    console.log('createStaveNote -- totalDuration', totalDuration, 'given total duration', dur, ',', i, 'staveNotes created');
     return [measureNotes, ties, staveNote, staveNotes];
   }
 
   addTie = (tiesArray, prev, current) => {
-    console.log('adding tie with', prev, current);
     const ties = tiesArray;
     if (prev !== null && current !== null && current !== prev) {
       const tie = new Vex.Flow.StaveTie({
@@ -517,11 +468,9 @@ class VexNotes extends Component {
   }
 
   addDots = (staveNote, duration) => {
-    console.log('staveNote.duration: ', duration);
     for (let i = 0; i <= duration.length; i += 1) {
       const char = duration.charAt(i);
       if (char === 'd') {
-        console.log('adding dot');
         staveNote.addDotToAll();
       }
     }
@@ -543,12 +492,10 @@ class VexNotes extends Component {
 
   // https://github.com/0xfe/vexflow/blob/master/tests/stavenote_tests.js#L337
   addListeners = (notesArr) => {
-    console.log('adding listeners to ', notesArr.length);
     let notes = notesArr;
     if (notes === undefined || notes === null || notes.length < this.state.notes.length) {
       notes = this.state.notes;
     }
-    console.log('adding listeners for notes:', notes);
     for (let j = 0; j < notes.length; j += 1) {
       const measure = notes[j];
       for (let i = 0; i < measure.length; i += 1) {
@@ -569,8 +516,8 @@ class VexNotes extends Component {
         // });
 
         element.addEventListener('click', () => {
-          const staveNote = this.getStaveNoteByID(note.attrs.id, notes);
-          console.log('staveNote.duration', staveNote.duration);
+          // const staveNote = this.getStaveNoteByID(note.attrs.id, notes);
+          // console.log('staveNote.duration', staveNote.duration);
         });
       }
     }
@@ -629,12 +576,10 @@ class VexNotes extends Component {
       noteValue = 8;
     }
     const value = noteValue;
-    console.log('value for', duration, ': ', value);
     return value;
   }
 
   getNoteCode = (n, type) => {
-    console.log('getNoteCode called with n', n);
     let code = null;
     if (n === 0.25) {
       code = '16';
@@ -671,12 +616,10 @@ class VexNotes extends Component {
     if (type === 'rest' && code !== null) {
       code = code.concat('r');
     }
-    console.log('returning code:', code);
     return code;
   }
 
   getClosestNoteCode = (n, type) => {
-    console.log('getClosestNoteCode called with n', n);
     let code = null;
     if (n === 0.25 || n < 0.5) {
       code = '16';
@@ -713,17 +656,14 @@ class VexNotes extends Component {
     if (type === 'rest') {
       code = code.concat('r');
     }
-    console.log('getClosestNote returning code:', code);
     return code;
   }
 
   parseTimeSignature = () => {
-    console.log('parseTimeSignature called');
     const arr = this.props.timeSignature.split('/');
     const beats = parseInt(arr[0], 10);
 
     const beatWorth = 4 / parseInt(arr[1], 10);
-    console.log('beatValue', beatWorth, 'bpm', beats);
     this.setState({ bpm: beats, beatValue: beatWorth });
     return [beats, beatWorth, parseInt(arr[1], 10)];
   }
@@ -748,7 +688,6 @@ class VexNotes extends Component {
         ticks += value;
       }
       tickArray.push(ticks);
-      console.log('ticks measure', i, ':', ticks);
     }
     for (let x = 0; x < tickArray.length; x += 1) {
       const tick = tickArray[x];
@@ -762,6 +701,7 @@ class VexNotes extends Component {
   }
 
   render() {
+    console.log('divid', this.props.divId);
     if (this.props.rerender) {
       this.renderVexFlow();
       this.props.rerenderComplete();

@@ -55,7 +55,6 @@ class Rhythm extends Component {
 
     const durationArray = this.createDurationArray(notes, bps, vexNotes);
     this.setState({ durationArray });
-    console.log('duration array', durationArray);
   }
 
   determineKeyPress = (note) => {
@@ -64,7 +63,6 @@ class Rhythm extends Component {
 
   createDurationArray = (noteArray, beatsPerSecond, vexNotesArray) => {
     let notes = noteArray;
-    console.log('notesArr:', notes);
     if (notes === null || notes === undefined) {
       notes = this.props.notes;
     }
@@ -85,7 +83,6 @@ class Rhythm extends Component {
       // eslint-disable-next-line no-unused-vars
       const keyPress = this.determineKeyPress(vexNotesArray[i]);
       if (this.isRest(notes[i])) {
-        console.log('i', i, 'isRest!');
         if (durationArray.length > 0) {
           durationArray[durationArray.length - 1] += duration;
         }
@@ -122,7 +119,6 @@ class Rhythm extends Component {
       correctTimes.push({ cumulativeTime, key: keyArray[i] });
       cumulativeTime += durationArray[i] * 1000;
     }
-    console.log('durationArray', durationArray, 'correctTimes', correctTimes, 'timeDelay', timeDelay);
     this.setState({ correctTimes, timeDelay });
     return durationArray;
   }
@@ -137,7 +133,6 @@ class Rhythm extends Component {
 
   calculateDuration = (noteCode, beatValue, bps) => {
     const noteDuration = this.getNoteDurationAsNumber(noteCode);
-    console.log('noteDuration:', noteDuration, 'beatValue', beatValue);
     const duration = noteDuration / (beatValue * bps);
     return duration;
   }
@@ -210,7 +205,6 @@ class Rhythm extends Component {
         <div />
       );
     } else {
-      console.log('vexNotes rendering', this.state.correctnessArray);
       // style={{ position: 'relative', right: this.state.rightAdjust }}
       return (
         <div>
@@ -219,7 +213,7 @@ class Rhythm extends Component {
             timeSignature={this.props.timeSignature}
             clef="treble"
             keySignature="C"
-            divId="rhythm-stave"
+            divId={`rhythm-stave-${this.props.currentPage}`}
             mode="rhythm"
             color={color}
             correctnessArray={this.state.correctnessArray}
@@ -233,23 +227,18 @@ class Rhythm extends Component {
   }
 
   getPixelDimensions = () => {
-    console.log('window resizing');
-    const win = window;
-    const doc = document;
-    const docElem = doc.documentElement;
-    const body = doc.getElementsByTagName('body')[0];
-    const x = win.innerWidth || docElem.clientWidth || body.clientWidth;
-    const y = win.innerHeight || docElem.clientHeight || body.clientHeight;
-    console.log('window x:', x);
-    console.log('window y:', y);
+    // const win = window;
+    // const doc = document;
+    // const docElem = doc.documentElement;
+    // const body = doc.getElementsByTagName('body')[0];
+    // const x = win.innerWidth || docElem.clientWidth || body.clientWidth;
+    // const y = win.innerHeight || docElem.clientHeight || body.clientHeight;
   }
 
   setMeasureCount = (count) => {
-    console.log('setMeasureCount called');
     const adjust = count * 6;
     let adjustAmount = adjust.toString();
     adjustAmount = adjustAmount.concat('vw');
-    console.log('setting rightAdjust to ', adjustAmount, 'adjust');
     this.setState({ rightAdjust: adjustAmount });
   }
 
@@ -291,24 +280,17 @@ class Rhythm extends Component {
       window.addEventListener('keydown', this.handleKeyDown);
     }
     this.setState({ clickTimes: null, baselineTime: null, playing: true });
-    console.log('playing metronome');
     const intervalTime = 1000 / this.state.bps;
     const bpm = this.getBeatsPerMeasure();
     const introTime = intervalTime * bpm;
     const totalTime = this.getTotalTime() * 1000 + introTime;
     this.calculateBaselineTimes(intervalTime, bpm);
-    console.log('totalTime:', totalTime, 'intervalTime:', intervalTime);
     let timeElapsed = 0;
-
-    console.log('totalTime', totalTime);
     if (this.state.countDownNumber === null) {
       this.setState({ countDownNumber: bpm });
     }
 
     let countDownNumber = bpm + 1;
-    if (!playAnswer) {
-      console.log('listening for student feedback');
-    }
 
     /* Set interval */
     const interval = setInterval(() => {
@@ -316,25 +298,23 @@ class Rhythm extends Component {
         countDownNumber -= 1;
         this.setState({ countDownNumber });
       }
-      if (this.state.baselineTime !== null) {
-        const date = new Date();
-        console.log('click at ', date.getTime() - this.state.baselineTime);
-      } else {
-        console.log('click ');
-      }
+      // if (this.state.baselineTime !== null) {
+      //   const date = new Date();
+      //   console.log('click at ', date.getTime() - this.state.baselineTime);
+      // } else {
+      //   console.log('click ');
+      // }
       this.state.metronomeAudio.volume = METRONOME_VOLUME;
       this.state.metronomeAudio.pause();
       this.state.metronomeAudio.play();
 
       if (timeElapsed === introTime && playAnswer) {
-        console.log('playing answer clicks with timeDelay', this.state.timeDelay);
         setTimeout(() => {
           this.playAnswerClicks(0);
         }, this.state.timeDelay * 1000);
       }
       timeElapsed += intervalTime;
       if (timeElapsed >= totalTime) {
-        console.log('exiting interval');
         setTimeout(() => {
           this.setState({ playing: false, userAttempting: false });
           this.checkAnswers(this.state.clickTimes, this.state.keyPresses, true, playAnswer);
@@ -375,8 +355,6 @@ class Rhythm extends Component {
       let success = true;
       const correctnessArray = [];
       const foundIndexes = [];
-
-      console.log('click times', clickTimes, 'correctTimes', this.state.correctTimes);
       // if (clickTimes.length === 1) {
       //   correctnessArray.push(1);
       //   this.setState({ correctnessArray });
@@ -388,19 +366,14 @@ class Rhythm extends Component {
         const error = Math.abs(correctTime - userTime);
         errorArray.push(error);
         if (error > 350 || (keyPresses[i] !== '' && keyPresses[i] !== undefined && keyPresses[i] !== this.state.correctTimes[i].key)) {
-          console.log('note ', i + 1, 'off by error', error);
-          console.log('keypress: ', keyPresses[i], ' shouldve been: ', this.state.correctTimes[i].key);
           success = false;
           correctnessArray.push(0);
         } else {
           correctnessArray.push(1);
         }
-
-        if (keyPresses[i] === '' || keyPresses[i] === undefined) {
-          console.log(this.state.correctnessArray, 'keypresses is nothing', keyPresses, i);
-        }
       }
       console.log('correctnessArray in checkAnswers', correctnessArray);
+      console.log('errorArray', errorArray);
 
       if (final && !success) {
         // this.props.registerFailure();
@@ -435,7 +408,6 @@ class Rhythm extends Component {
   }
 
   handleKeyDown = (event) => {
-    console.log('handling keydown', event.code);
     event.preventDefault();
     let { clickTimes, keyPresses } = this.state;
     const d = new Date();
@@ -457,9 +429,7 @@ class Rhythm extends Component {
       keyPresses.push('a');
       clickTimes = this.processUserInput(clickTimes);
       this.checkAnswers(clickTimes, keyPresses);
-      console.log('correctnessArray', this.state.correctnessArray);
       this.setState({ clickTimes, keyPresses });
-      console.log('setting keypresses in space', keyPresses);
     }
 
     // f-key click
@@ -473,9 +443,7 @@ class Rhythm extends Component {
       keyPresses.push('f');
       clickTimes = this.processUserInput(clickTimes);
       this.checkAnswers(clickTimes, keyPresses);
-      console.log('correctnessArray', this.state.correctnessArray);
       this.setState({ clickTimes, keyPresses });
-      console.log('setting keypresses in f', keyPresses);
     }
 
     if (event.code === 'KeyJ' && this.state.userAttempting) {
@@ -488,9 +456,7 @@ class Rhythm extends Component {
       keyPresses.push('e');
       clickTimes = this.processUserInput(clickTimes);
       this.checkAnswers(clickTimes, keyPresses);
-      console.log('correctnessArray', this.state.correctnessArray);
       this.setState({ clickTimes, keyPresses });
-      console.log('setting keypresses in j', keyPresses);
     }
 
     // j-key click
@@ -536,7 +502,6 @@ class Rhythm extends Component {
   playAnswerClicks = (i) => {
     if (i < this.state.durationArray.length) {
       const interval = this.state.durationArray[i] * 1000;
-      console.log('playing answer with interval', interval);
       this.state.tapAudio.pause();
       this.state.tapAudio.play();
       this.lightSpaceBar();
@@ -551,20 +516,16 @@ class Rhythm extends Component {
     for (let i = 0; i < this.state.durationArray.length; i += 1) {
       totalTime += this.state.durationArray[i];
     }
-
-    console.log('totalTime', totalTime, 'vs other', (this.state.correctTimes[this.state.correctTimes.length - 1]) / 1000);
     // const tTime = this.state.correctTimes[this.state.correctTimes.length - 1] / 1000 + 2;
     return totalTime;
   }
 
   playAnswer = () => {
-    console.log('playing answer');
     this.setState({ playing: true });
     this.playMetronome(true);
   }
 
   attemptExercise = () => {
-    console.log('playing answer');
     this.setState({
       userAttempting: true, clickTimes: null, keyPresses: [], rerender: true, correctnessArray: [],
     });
@@ -653,7 +614,6 @@ class Rhythm extends Component {
   }
 
   goToNext = () => {
-    console.log('going to next in rhythms');
     this.props.goToNext(this.state.attempts, 'Rhythm-Sensing');
   }
 
@@ -670,7 +630,6 @@ class Rhythm extends Component {
   }
 
   render() {
-    console.log('re-rendering');
     let boxShadow = '';
     if (this.state.success && this.state.correctnessArray.length === this.state.durationArray.length) {
       boxShadow = '0 0 50px 30px #9ef509';
@@ -678,11 +637,11 @@ class Rhythm extends Component {
     return (
       <div>
         <div className="rhythmPage">
-          <div className="instructions">
+          {/* <div className="instructions">
             {this.props.instructions}
             <br />
             <div style={{ fontSize: '0.7em' }}>If you&apos;re experiencing lag, try switching to wire headphones or playing audio out loud. When you’re ready to try it, click start attempt!</div>
-          </div>
+          </div> */}
           <div className="countdown-holder">{this.renderCountDown()}</div>
           <div className="rhythm-vex-container" style={{ boxShadow }}>{this.renderVexNotes()}</div>
           {this.renderButtonsOrSpaceBar()}

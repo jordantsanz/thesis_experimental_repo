@@ -112,7 +112,7 @@ class Lesson extends Component {
   goToNext = (attempts, type) => {
     console.log('going to next!');
     if (this.props.type === 'preview') {
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 1 }));
+      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6 }));
     } else {
       console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
@@ -121,7 +121,7 @@ class Lesson extends Component {
         }
         this.props.getUserInfo();
       }
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 1 }));
+      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6 }));
       console.log('finished going to next');
     }
   }
@@ -132,7 +132,7 @@ class Lesson extends Component {
     //   lesson = this.props.lessonMaking;
     //   console.log('lesson:', lesson);
     // }
-    console.log('creating pages with lives', this.state.lives);
+    console.log('the lesson', lesson);
     const pagesList = [];
 
     for (let i = 0; i < lesson.pages.length; i++) {
@@ -153,7 +153,7 @@ class Lesson extends Component {
           type={this.props.type}
           changePage={this.changePage}
           pageCount={lesson.pages.length}
-          currentPage={this.state.currentPage}
+          currentPage={this.state.currentPage + i - 1}
         />,
       );
     }
@@ -211,6 +211,11 @@ class Lesson extends Component {
         return (
           <div>
             {pages[this.state.currentPage - 1]}
+            {pages[this.state.currentPage]}
+            {pages[this.state.currentPage + 1]}
+            {pages[this.state.currentPage + 2]}
+            {pages[this.state.currentPage + 3]}
+            {pages[this.state.currentPage + 4]}
           </div>
         );
       } else {
