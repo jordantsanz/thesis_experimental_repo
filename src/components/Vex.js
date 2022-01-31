@@ -80,7 +80,7 @@ class VexNotes extends Component {
 
   setNoteColors = (measures, ties) => {
     console.log('setting note colors', this.props.correctnessArray);
-
+    console.log(this.props.correctnessArray);
     if (this.props.mode === 'rhythm' && this.props.correctnessArray !== undefined && this.props.correctnessArray !== null) {
       console.log('in if');
       let noteCount = 0;
@@ -100,7 +100,6 @@ class VexNotes extends Component {
           } else if (!this.isRest(note)) {
             if (this.props.correctnessArray.length > noteCount) {
               if (this.props.correctnessArray[noteCount] === 1) {
-                console.log('setting note');
                 note.setStyle({ fillStyle: 'green', strokeStyle: 'green' });
                 if (hasTie) {
                   console.log('hasTie');

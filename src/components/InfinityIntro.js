@@ -5,6 +5,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import RecordView from './RecordView';
 
 class InfinityIntro extends Component {
   constructor(props) {
@@ -41,7 +42,8 @@ class InfinityIntro extends Component {
     return (
       <div className="infinity">
         <div className="infinity-body">
-          <div className="infinity-title infinity-title-top">Are you ready for a challenge?</div>
+          <RecordView />
+          <div className="infinity-title infinity-title-top">Text to provide beforehand</div>
           <div className="inf-play-holder" onClick={this.begin}>
             <div className="inf-play green">
               Play

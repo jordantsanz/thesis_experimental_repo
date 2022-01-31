@@ -28,6 +28,7 @@ const Page = (props) => {
           activityID={props.page._id}
           notes={props.page.info.r.notes}
           timeSignature={props.page.info.r.time_signature}
+          keys={props.page.info.r.keys}
           bpm={props.page.info.r.bpm}
           goToNext={props.goToNext}
           lives={props.lives}

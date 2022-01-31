@@ -9,7 +9,8 @@ import { generateRhythmActivity } from '../components/Random';
 // import { generateRandomActivity } from '../components/published_components/lesson_creation_components/RandomActivityGenerator';
 // root url for local: change to #####-heroku.com/api
 // const ROOT_URL = 'https://aptitune-api.herokuapp.com/api';
-const ROOT_URL = 'http://localhost:9090/api';
+// const ROOT_URL = 'http://localhost:9090/api';
+const ROOT_URL = 'http://localhost:5000';
 // action types
 export const ActionTypes = {
   BETA_AUTH: 'BETA_AUTH',
@@ -66,6 +67,18 @@ export function makeContentPage(lessonid, fields) {
       console.log('response was: ', response);
       dispatch({ type: ActionTypes.CREATE_CONTENT_PAGE, payload: response.data });
     });
+  });
+}
+
+export function sendVideo(video) {
+  const formData = new FormData();
+  formData.append('video', video);
+  axios.post(`${ROOT_URL}/video`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  }).then((res) => {
+    console.log(res);
   });
 }
 

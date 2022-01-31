@@ -172,6 +172,11 @@ function optionsFromDifficulty(difficulty) {
   } else return choiceArray;
 }
 
+function getRandomKey() {
+  const keyOptions = ['f', 'a', 'e'];
+  return keyOptions[parseInt((Math.random() * (keyOptions.length - 1)), 10)];
+}
+
 function getRandomDuration(beats, prev) {
   /*
     Given # of beats left, get a note with a shorter duration than that
@@ -231,6 +236,7 @@ function generateRhythmDurations(timeSignature) {
   const beatValue = parseInt(arr[1], 10);
   let measureCount = 0;
   const durations = [];
+  const keys = [];
 
   let beatCode = 'q';
   // interpret denominator
@@ -249,6 +255,12 @@ function generateRhythmDurations(timeSignature) {
         prev = durations[durations.length - 1];
       }
       const duration = getRandomDuration(beatCount, prev);
+      let key = '';
+      if (duration.includes('r')) {
+        key = '';
+      } else {
+        key = getRandomKey();
+      }
       if (duration === null) {
         depth = 51;
       } else {
@@ -257,13 +269,14 @@ function generateRhythmDurations(timeSignature) {
         // console.log('durationValue for', duration, 'durationValue', durationValue);
         beatCount -= durationValue;
         durations.push(duration);
+        keys.push(key);
         depth += 1;
       }
     }
     measureCount += 1;
   }
   // console.log('returning durations', durations);
-  return durations;
+  return { durations, keys };
 }
 
 function assignClefToNotes(notes, clef) {
@@ -611,7 +624,7 @@ export function generateRhythmActivity() {
 
   const timeSignature = generateTimeSignature();
   // console.log('timeSignature', timeSignature);
-  const durations = generateRhythmDurations(timeSignature);
+  const { durations, keys } = generateRhythmDurations(timeSignature);
   // console.log('durations', durations);
   const bpm = generateRandomBPM(); // generateRandomBPM();
   const output = {
@@ -624,6 +637,7 @@ export function generateRhythmActivity() {
         bpm,
         time_signature: timeSignature,
         notes: durations,
+        keys,
         answer_count: 0,
       },
     },

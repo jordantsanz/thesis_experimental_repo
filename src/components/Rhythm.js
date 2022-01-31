@@ -24,6 +24,7 @@ class Rhythm extends Component {
       errorArray: null,
       success: null,
       correctnessArray: [],
+      keyPresses: [],
       rerender: false,
       foundIndexes: [],
       rightAdjust: '12vw',
@@ -35,17 +36,17 @@ class Rhythm extends Component {
   }
 
   componentDidMount = () => {
-    this.initializeRhythmExercise(this.props.notes);
+    this.initializeRhythmExercise(this.props.notes, this.props.keys);
   }
 
-  initializeRhythmExercise = (noteArray) => {
+  initializeRhythmExercise = (noteArray, keyArray) => {
     let notes = noteArray;
     if (notes === null || notes === undefined) {
       notes = this.props.notes;
     }
 
     // format notes for vexflow
-    const vexNotes = this.formatForVex(notes);
+    const vexNotes = this.formatForVex(notes, keyArray);
     this.setState({ vexNotes });
 
     // prep for exercise start
@@ -185,14 +186,14 @@ class Rhythm extends Component {
     return value;
   }
 
-  formatForVex = (noteArray) => {
+  formatForVex = (noteArray, keyArray) => {
     let notes = noteArray;
     if (notes === null || notes === undefined) {
       notes = this.props.notes;
     }
     const vexNotes = [];
     for (let i = 0; i < notes.length; i += 1) {
-      const vexNote = { clef: 'treble', keys: ['f/4'], duration: notes[i] };
+      const vexNote = { clef: 'treble', keys: [`${keyArray[i] === '' ? 'a' : keyArray[i]}/4`], duration: notes[i] };
       vexNotes.push(vexNote);
     }
     return vexNotes;
@@ -336,7 +337,7 @@ class Rhythm extends Component {
         console.log('exiting interval');
         setTimeout(() => {
           this.setState({ playing: false, userAttempting: false });
-          this.checkAnswers(this.state.clickTimes, '', true, playAnswer);
+          this.checkAnswers(this.state.clickTimes, this.state.keyPresses, true, playAnswer);
           this.setState({ countDownNumber: null, playing: false });
           if (!playAnswer) {
             window.removeEventListener('keydown', this.handleKeyDown);
@@ -355,10 +356,15 @@ class Rhythm extends Component {
     }, intervalTime);
   }
 
-  checkAnswers = (cTimes, optionalKey, final, playAnswer) => {
+  checkAnswers = (cTimes, kPresses, final, playAnswer) => {
     let clickTimes = cTimes;
+    let keyPresses = kPresses;
     if (clickTimes === null) {
       clickTimes = this.state.clickTimes;
+    }
+
+    if (keyPresses === null) {
+      keyPresses = this.state.keyPresses;
     }
 
     if (clickTimes === null && this.state.correctTimes.length === 0) {
@@ -379,15 +385,19 @@ class Rhythm extends Component {
       for (let i = 0; i < clickTimes.length; i += 1) {
         const userTime = clickTimes[i];
         const correctTime = this.state.correctTimes[i].cumulativeTime;
-        const correctKey = this.state.correctTimes[i].key;
         const error = Math.abs(correctTime - userTime);
         errorArray.push(error);
-        if (error > 350 || correctKey !== optionalKey) {
+        if (error > 350 || (keyPresses[i] !== '' && keyPresses[i] !== undefined && keyPresses[i] !== this.state.correctTimes[i].key)) {
           console.log('note ', i + 1, 'off by error', error);
+          console.log('keypress: ', keyPresses[i], ' shouldve been: ', this.state.correctTimes[i].key);
           success = false;
           correctnessArray.push(0);
         } else {
           correctnessArray.push(1);
+        }
+
+        if (keyPresses[i] === '' || keyPresses[i] === undefined) {
+          console.log(this.state.correctnessArray, 'keypresses is nothing', keyPresses, i);
         }
       }
       console.log('correctnessArray in checkAnswers', correctnessArray);
@@ -427,10 +437,13 @@ class Rhythm extends Component {
   handleKeyDown = (event) => {
     console.log('handling keydown', event.code);
     event.preventDefault();
-    let { clickTimes } = this.state;
+    let { clickTimes, keyPresses } = this.state;
     const d = new Date();
     if (clickTimes === null) {
       clickTimes = [];
+    }
+    if (keyPresses === null) {
+      keyPresses = [];
     }
 
     // spacebar click
@@ -441,10 +454,12 @@ class Rhythm extends Component {
       this.state.tapAudio.play();
       const timeClicked = d.getTime();
       clickTimes.push(timeClicked);
+      keyPresses.push('a');
       clickTimes = this.processUserInput(clickTimes);
-      this.checkAnswers(clickTimes, 'a');
+      this.checkAnswers(clickTimes, keyPresses);
       console.log('correctnessArray', this.state.correctnessArray);
-      this.setState({ clickTimes });
+      this.setState({ clickTimes, keyPresses });
+      console.log('setting keypresses in space', keyPresses);
     }
 
     // f-key click
@@ -455,10 +470,12 @@ class Rhythm extends Component {
       this.state.tapAudio.play();
       const timeClicked = d.getTime();
       clickTimes.push(timeClicked);
+      keyPresses.push('f');
       clickTimes = this.processUserInput(clickTimes);
-      this.checkAnswers(clickTimes, 'f');
+      this.checkAnswers(clickTimes, keyPresses);
       console.log('correctnessArray', this.state.correctnessArray);
-      this.setState({ clickTimes });
+      this.setState({ clickTimes, keyPresses });
+      console.log('setting keypresses in f', keyPresses);
     }
 
     if (event.code === 'KeyJ' && this.state.userAttempting) {
@@ -468,10 +485,12 @@ class Rhythm extends Component {
       this.state.tapAudio.play();
       const timeClicked = d.getTime();
       clickTimes.push(timeClicked);
+      keyPresses.push('e');
       clickTimes = this.processUserInput(clickTimes);
-      this.checkAnswers(clickTimes, 'e');
+      this.checkAnswers(clickTimes, keyPresses);
       console.log('correctnessArray', this.state.correctnessArray);
-      this.setState({ clickTimes });
+      this.setState({ clickTimes, keyPresses });
+      console.log('setting keypresses in j', keyPresses);
     }
 
     // j-key click
@@ -515,9 +534,7 @@ class Rhythm extends Component {
   }
 
   playAnswerClicks = (i) => {
-    console.log('durationArray', this.state.durationArray);
     if (i < this.state.durationArray.length) {
-      console.log('playing click', i, 'of', this.state.correctTimes.length);
       const interval = this.state.durationArray[i] * 1000;
       console.log('playing answer with interval', interval);
       this.state.tapAudio.pause();
@@ -549,7 +566,7 @@ class Rhythm extends Component {
   attemptExercise = () => {
     console.log('playing answer');
     this.setState({
-      userAttempting: true, clickTimes: null, rerender: true, correctnessArray: [],
+      userAttempting: true, clickTimes: null, keyPresses: [], rerender: true, correctnessArray: [],
     });
     this.playMetronome(false);
   }
@@ -669,12 +686,6 @@ class Rhythm extends Component {
           <div className="countdown-holder">{this.renderCountDown()}</div>
           <div className="rhythm-vex-container" style={{ boxShadow }}>{this.renderVexNotes()}</div>
           {this.renderButtonsOrSpaceBar()}
-          {/* <div className="rhythm-spacebar" id="rhythm-spacebar" />
-        <div className="rhythm-buttons">
-          <div>{this.renderPlayButton()}</div>
-          <div>{this.renderGoButton()}</div>
-        </div> */}
-          {/* <div>{this.renderSuccessMessage()}</div> */}
           {this.renderNextButton()}
         </div>
       </div>
