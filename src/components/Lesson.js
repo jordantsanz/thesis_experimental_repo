@@ -9,8 +9,10 @@ import {
   getLesson, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
+import NextButton from './Exercises/NextButton';
 import Rhythm from './Rhythm';
 import InfinityIntro from './InfinityIntro';
+import RecordView from './RecordView';
 
 const Page = (props) => {
   console.log('page props', props);
@@ -33,6 +35,7 @@ const Page = (props) => {
           goToNext={props.goToNext}
           lives={props.lives}
           registerFailure={props.registerFailure}
+          registerSuccess={props.registerSuccess}
           infinity={props.infinity}
           level={props.level}
           type={type}
@@ -71,7 +74,6 @@ const Page = (props) => {
 class Lesson extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       currentPage: 1,
       lives: -1,
@@ -80,6 +82,7 @@ class Lesson extends Component {
       coins: 0,
       intro: true,
       pages: null,
+      pagesCompleted: 0,
     };
   }
 
@@ -99,20 +102,24 @@ class Lesson extends Component {
     }
   }
 
-  registerFailure = () => {
-    if (this.state.random) {
-      const lives = this.state.lives - 1;
-      if (lives === 0) {
-        // finish
-      }
-      this.setState((prevState) => { return { lives: prevState.lives - 1 }; });
-    }
+  registerFailure = (errorArray, correctnessArray) => {
+    this.setState((prevState) => ({
+      pagesCompleted: prevState.pagesCompleted + 1,
+    }));
+    console.log(errorArray, correctnessArray);
+  }
+
+  registerSuccess = (errorArray, correctnessArray) => {
+    this.setState((prevState) => ({
+      pagesCompleted: prevState.pagesCompleted + 1,
+    }));
+    console.log(errorArray, correctnessArray);
   }
 
   goToNext = (attempts, type) => {
     console.log('going to next!');
     if (this.props.type === 'preview') {
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6 }));
+      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: 0 }));
     } else {
       console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
@@ -121,7 +128,7 @@ class Lesson extends Component {
         }
         this.props.getUserInfo();
       }
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6 }));
+      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: 0 }));
       console.log('finished going to next');
     }
   }
@@ -148,6 +155,7 @@ class Lesson extends Component {
           goToNext={this.goToNext}
           lives={this.state.lives}
           registerFailure={this.registerFailure}
+          registerSuccess={this.registerSuccess}
           infinity={this.state.random}
           level={i + 1}
           type={this.props.type}
@@ -162,6 +170,18 @@ class Lesson extends Component {
 
   changePage = (n) => {
     this.setState((prevState) => ({ currentPage: prevState.currentPage + n }));
+  }
+
+  renderNextButton = () => {
+    if (this.state.pagesCompleted === 6) {
+      return (
+        <NextButton goToNext={this.goToNext} />
+      );
+    } else {
+      return (
+        <div />
+      );
+    }
   }
 
   reset = () => {
@@ -210,12 +230,14 @@ class Lesson extends Component {
       if (this.state.currentPage <= pages.length) {
         return (
           <div>
+            <RecordView />
             {pages[this.state.currentPage - 1]}
-            {pages[this.state.currentPage]}
+            {/* {pages[this.state.currentPage]}
             {pages[this.state.currentPage + 1]}
             {pages[this.state.currentPage + 2]}
             {pages[this.state.currentPage + 3]}
-            {pages[this.state.currentPage + 4]}
+            {pages[this.state.currentPage + 4]} */}
+            {this.renderNextButton()}
           </div>
         );
       } else {

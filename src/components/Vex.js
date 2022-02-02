@@ -183,39 +183,57 @@ class VexNotes extends Component {
     let measureNotes = [];
     const arr = this.parseTimeSignature();
     const bpm = arr[0];
-    const beatValue = arr[1];
-    const timePerMeasure = bpm * beatValue;
+    const beatValue = arr[1]; // which note gets one beat
+    const timePerMeasure = bpm * beatValue; // beats per measure * which note gets one beat
     let beatCount = 0;
     let staveNote = null;
     let previous = null;
 
+    // for all notes in the array
     for (let i = 0; i < jsonNotes.length; i += 1) {
-      const note = jsonNotes[i];
-      const duration = note.duration;
+      const note = jsonNotes[i]; // get note
+      const duration = note.duration; // get duration
+
+      // get total beats so far
       beatCount += this.getNoteDurationAsNumber(duration, beatValue);
+
+      // if current beats so far is less than amount in one measure
       if (beatCount < timePerMeasure) {
-        // measure incomplete
+        // create and push note into measure
         staveNote = new Vex.Flow.StaveNote({ clef: this.props.clef, keys: note.keys, duration });
         measureNotes.push(staveNote);
+
+        // if there is a tie, add the tie
         if (note.tie !== undefined) {
           ties = this.addTie(ties, previous, staveNote);
         }
+
+        // if there are dots, add the dots
         this.addDots(staveNote, duration);
         previous = staveNote;
         staveNotes.push(staveNote);
+
+        // else if this finishes the measure
       } else if (beatCount === timePerMeasure) {
         // measure complete
         staveNote = new Vex.Flow.StaveNote({ clef: this.props.clef, keys: note.keys, duration });
         measureNotes.push(staveNote);
+
+        // save as a measure
         measures.push(measureNotes);
+
         beatCount = 0;
         measureNotes = [];
         if (note.tie !== undefined) {
           ties = this.addTie(ties, previous, staveNote);
         }
+
+        // add dots
         this.addDots(staveNote, duration);
         previous = staveNote;
         staveNotes.push(staveNote);
+
+        // if beat is over amount in measure
       } else if (beatCount > timePerMeasure) {
         const lastNoteDuration = this.getNoteDurationAsNumber(duration, beatValue);
         const difference = timePerMeasure - (beatCount - lastNoteDuration); // time left in first measure
@@ -248,8 +266,11 @@ class VexNotes extends Component {
       }
     }
 
+    // if there are notes in the measure
     if (measureNotes.length !== 0) {
+      // while there are beats left for the measure
       while (beatCount < timePerMeasure) {
+        // get duration of this note
         let duration = this.getNoteCode(timePerMeasure - beatCount, 'rest');
         if (duration === null) {
           duration = this.getClosestNoteCode(timePerMeasure - beatCount, 'rest');
@@ -290,7 +311,7 @@ class VexNotes extends Component {
     const sizeArr = this.getWindowDimensions(notesArray);
     const x = sizeArr[0];
     const y = sizeArr[1];
-    renderer.resize(x, y);
+    renderer.resize(x + 200, y);
 
     const context = renderer.getContext();
 
@@ -301,13 +322,21 @@ class VexNotes extends Component {
     stave.addClef(this.props.clef).addTimeSignature(this.props.timeSignature).addKeySignature(this.props.keySignature);
     stave.setContext(context).draw();
 
-    const maxLineWidth = x;
+    const maxLineWidth = Infinity;
     let xLocation = stave.x;
     let yLocation = stave.y;
     let newLine = true;
     let measureNotes = [];
+    let anotherStaff = false;
     let i = 0;
     for (i; i < measures.length; i += 1) {
+      console.log('rendering measure ', i);
+      if (i % 4 === 0 && i !== 0) {
+        newLine = true;
+        xLocation = 10;
+        anotherStaff = true;
+        yLocation += 80;
+      }
       measureNotes = measures[i];
       const measureWidth = this.getMeasureWidth(measureNotes);
 
@@ -318,11 +347,11 @@ class VexNotes extends Component {
 
         Vex.Flow.Accidental.applyAccidentals([voice], this.props.keySignature);
         // eslint-disable-next-line no-unused-vars
-        const formatter = new VF.Formatter().joinVoices([voice]).format([voice], measureWidth - 80);
+        const formatter = new VF.Formatter({ softmaxFactor: 2 }).joinVoices([voice]).format([voice], measureWidth - 80);
 
         // Render voice
-        voice.draw(context, stave);
-        // VF.Formatter.FormatAndDraw(context, stave, measureNotes);
+        // voice.draw(context, stave);
+        VF.Formatter.FormatAndDraw(context, stave, measureNotes);
         newLine = false;
         xLocation += firstMeasureWidth;
         if (xLocation >= maxLineWidth) {
@@ -331,13 +360,22 @@ class VexNotes extends Component {
           newLine = true;
         }
       } else {
-        let staveMeasure = new VF.Stave(xLocation, yLocation, measureWidth);
-
-        if (newLine) {
-          staveMeasure = new VF.Stave(xLocation, yLocation, firstMeasureWidth);
+        console.log('making new staff in else');
+        let staveMeasure;
+        if (anotherStaff) {
+          staveMeasure = new VF.Stave(xLocation, yLocation, measureWidth);
+          console.log('new line');
           staveMeasure.addClef(this.props.clef).addKeySignature(this.props.keySignature);
-          newLine = false;
+          anotherStaff = false;
+        } else {
+          staveMeasure = new VF.Stave(xLocation, yLocation, measureWidth);
         }
+
+        // if (newLine) {
+        //   console.log('making new staff in new line if');
+        //   staveMeasure = new VF.Stave(xLocation, yLocation, firstMeasureWidth);
+        //   newLine = false;
+        // }
         const voice = new VF.Voice({ num_beats: bpm, beat_value: beatCount });
         // .setMode(Vex.Flow.Voice.Mode.SOFT)
         voice.addTickables(measureNotes);
@@ -439,6 +477,11 @@ class VexNotes extends Component {
   getMeasureWidth = (measureNotes) => {
     let width = 160;
     width += measureNotes.length * 20;
+    for (let i = 0; i < measureNotes.length; i += 1) {
+      if (measureNotes[i].duration === 'h') {
+        width += 40;
+      }
+    }
     return width;
   }
 
@@ -659,11 +702,12 @@ class VexNotes extends Component {
     return code;
   }
 
+  // finds out time signature
   parseTimeSignature = () => {
     const arr = this.props.timeSignature.split('/');
-    const beats = parseInt(arr[0], 10);
+    const beats = parseInt(arr[0], 10); // how many beats per bar
 
-    const beatWorth = 4 / parseInt(arr[1], 10);
+    const beatWorth = 4 / parseInt(arr[1], 10); // which note is one beat
     this.setState({ bpm: beats, beatValue: beatWorth });
     return [beats, beatWorth, parseInt(arr[1], 10)];
   }

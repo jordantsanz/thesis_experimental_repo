@@ -25,6 +25,8 @@ const socketRoutes = {
   DISCONNECT: 'manual-disconnect',
 };
 
+const TOTAL_MEASURES = 12;
+
 const choiceArray = {
   EASY: [
     'q', 'q', 'h', 'h', 'h', 'h', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'q', 'h', 'h', 'h', 'h',
@@ -53,4 +55,5 @@ export {
   socketRoutes,
   choiceArray,
   bpmChoices,
+  TOTAL_MEASURES,
 };

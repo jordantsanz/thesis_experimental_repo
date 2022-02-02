@@ -27,7 +27,7 @@ Output:
     2. Exponentially more xp for correct answers as they proceed farther and farther (starting really low)
 
 */
-import { difficulties, choiceArray } from '../lib/constants';
+import { difficulties, choiceArray, TOTAL_MEASURES } from '../lib/constants';
 /* Helper functions level 2 */
 function generateTimeSignature() {
   return '4/4';
@@ -244,7 +244,7 @@ function generateRhythmDurations(timeSignature) {
     beatCode = '8';
   }
 
-  while (measureCount < 2) {
+  while (measureCount < TOTAL_MEASURES) {
     let beatCount = num * getNoteDurationAsNumber(beatCode);
     // console.log('beatCountRandom', beatCount);
     let depth = 0;

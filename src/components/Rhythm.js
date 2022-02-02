@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
 import { TAP_VOLUME, METRONOME_VOLUME } from '../lib/constants';
-import NextButton from './Exercises/NextButton';
+// import NextButton from './Exercises/NextButton';
 import VexNotes from './Vex';
 // eslint-disable-next-line no-unused-vars
 
@@ -25,6 +25,7 @@ class Rhythm extends Component {
       success: null,
       correctnessArray: [],
       keyPresses: [],
+      accuracyArray: [],
       rerender: false,
       foundIndexes: [],
       rightAdjust: '12vw',
@@ -339,6 +340,7 @@ class Rhythm extends Component {
   checkAnswers = (cTimes, kPresses, final, playAnswer) => {
     let clickTimes = cTimes;
     let keyPresses = kPresses;
+    const { accuracyArray } = this.state;
     if (clickTimes === null) {
       clickTimes = this.state.clickTimes;
     }
@@ -365,6 +367,7 @@ class Rhythm extends Component {
         const correctTime = this.state.correctTimes[i].cumulativeTime;
         const error = Math.abs(correctTime - userTime);
         errorArray.push(error);
+        accuracyArray.push(keyPresses[i] !== '' && keyPresses !== undefined && keyPresses !== this.state.correctTimes[i] ? 0 : 1);
         if (error > 350 || (keyPresses[i] !== '' && keyPresses[i] !== undefined && keyPresses[i] !== this.state.correctTimes[i].key)) {
           success = false;
           correctnessArray.push(0);
@@ -374,18 +377,22 @@ class Rhythm extends Component {
       }
       console.log('correctnessArray in checkAnswers', correctnessArray);
       console.log('errorArray', errorArray);
+      console.log('accuracy array', accuracyArray);
 
       if (final && !success) {
-        // this.props.registerFailure();
+        this.props.registerFailure(errorArray, correctnessArray);
+        this.setState({ sentCompleted: true });
       } else if (final && success && !this.state.sentCompleted) {
         this.setState({ sentCompleted: true });
+        this.props.registerSuccess(errorArray, correctnessArray);
       }
       this.setState({
-        success, errorArray, correctnessArray, rerender: true, foundIndexes,
+        success, errorArray, correctnessArray, rerender: true, foundIndexes, accuracyArray,
       });
       // }
     } else if (final && !playAnswer) {
-      // this.props.registerFailure();
+      this.props.registerFailure(this.state.errorArray, this.state.correctnessArray);
+      this.setState({ sentCompleted: true });
     }
   }
 
@@ -593,7 +600,11 @@ class Rhythm extends Component {
   }
 
   renderButtonsOrSpaceBar = () => {
-    if (this.state.playing && !(this.state.success && this.state.correctnessArray.length === this.state.durationArray.length)) {
+    if (this.state.sentCompleted) {
+      return (
+        <div />
+      );
+    } else if (this.state.playing && !(this.state.success && this.state.correctnessArray.length === this.state.durationArray.length)) {
       return (
         <div>
           <div className="rhythm-spacebar" id="rhythm-spacebar" />
@@ -617,17 +628,17 @@ class Rhythm extends Component {
     this.props.goToNext(this.state.attempts, 'Rhythm-Sensing');
   }
 
-  renderNextButton = () => {
-    if (this.state.success && this.state.correctnessArray.length === this.state.durationArray.length) {
-      return (
-        <NextButton goToNext={this.goToNext} />
-      );
-    } else {
-      return (
-        <div />
-      );
-    }
-  }
+  // renderNextButton = () => {
+  //   if (this.state.success && this.state.correctnessArray.length === this.state.durationArray.length) {
+  //     return (
+  //       <NextButton goToNext={this.goToNext} />
+  //     );
+  //   } else {
+  //     return (
+  //       <div />
+  //     );
+  //   }
+  // }
 
   render() {
     let boxShadow = '';
@@ -645,7 +656,7 @@ class Rhythm extends Component {
           <div className="countdown-holder">{this.renderCountDown()}</div>
           <div className="rhythm-vex-container" style={{ boxShadow }}>{this.renderVexNotes()}</div>
           {this.renderButtonsOrSpaceBar()}
-          {this.renderNextButton()}
+          {/* {this.renderNextButton()} */}
         </div>
       </div>
     );
