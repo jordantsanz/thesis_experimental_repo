@@ -5,17 +5,35 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
+import { useReactMediaRecorder } from 'react-media-recorder';
 import {
-  getLesson, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
+  getLesson, getErrorPercent,
+  resetAllCorrectness, getAccuracyPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
 import NextButton from './Exercises/NextButton';
 import Rhythm from './Rhythm';
 import InfinityIntro from './InfinityIntro';
-import RecordView from './RecordView';
 
 const Page = (props) => {
-  console.log('page props', props);
+  const stopped = (url, blob) => {
+    console.log(blob);
+    console.log('in stopped');
+    const myFile = new File(
+      [blob],
+      'name.mp4',
+      { type: 'video/mp4' },
+    );
+    props.sendVideo(myFile);
+  };
+  const {
+    startRecording,
+    stopRecording,
+    mediaBlobUrl,
+    status,
+  } = useReactMediaRecorder({ video: true, onStop: stopped, blobPropertyBag: { type: 'video/mp4' } });
+  console.log({ mediaBlobUrl });
+
   let { type } = props;
   if (type === undefined) {
     type = 'Normal';
@@ -26,6 +44,9 @@ const Page = (props) => {
         <Rhythm
           percentage={props.percentage}
           xp={props.xp}
+          stopRecording={stopRecording}
+          status={status}
+          startRecording={startRecording}
           instructions={props.page.info.r.instructions}
           activityID={props.page._id}
           notes={props.page.info.r.notes}
@@ -34,8 +55,7 @@ const Page = (props) => {
           bpm={props.page.info.r.bpm}
           goToNext={props.goToNext}
           lives={props.lives}
-          registerFailure={props.registerFailure}
-          registerSuccess={props.registerSuccess}
+          registerCompletion={props.registerCompletion}
           infinity={props.infinity}
           level={props.level}
           type={type}
@@ -82,7 +102,8 @@ class Lesson extends Component {
       coins: 0,
       intro: true,
       pages: null,
-      pagesCompleted: 0,
+      pagesCompleted: false,
+      determiningCompletion: false,
     };
   }
 
@@ -102,24 +123,17 @@ class Lesson extends Component {
     }
   }
 
-  registerFailure = (errorArray, correctnessArray) => {
-    this.setState((prevState) => ({
-      pagesCompleted: prevState.pagesCompleted + 1,
-    }));
-    console.log(errorArray, correctnessArray);
-  }
-
-  registerSuccess = (errorArray, correctnessArray) => {
-    this.setState((prevState) => ({
-      pagesCompleted: prevState.pagesCompleted + 1,
-    }));
-    console.log(errorArray, correctnessArray);
+  registerCompletion = (errorArray, accuracyArray) => {
+    console.log('register completion called');
+    this.props.getErrorPercent(errorArray);
+    this.props.getAccuracyPercent(accuracyArray);
+    this.setState({ pagesCompleted: true });
   }
 
   goToNext = (attempts, type) => {
     console.log('going to next!');
     if (this.props.type === 'preview') {
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: 0 }));
+      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: true, determiningCompletion: true }));
     } else {
       console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
@@ -128,7 +142,7 @@ class Lesson extends Component {
         }
         this.props.getUserInfo();
       }
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: 0 }));
+      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: true, determiningCompletion: true }));
       console.log('finished going to next');
     }
   }
@@ -154,14 +168,14 @@ class Lesson extends Component {
           key={i}
           goToNext={this.goToNext}
           lives={this.state.lives}
-          registerFailure={this.registerFailure}
-          registerSuccess={this.registerSuccess}
+          registerCompletion={this.registerCompletion}
           infinity={this.state.random}
           level={i + 1}
           type={this.props.type}
           changePage={this.changePage}
           pageCount={lesson.pages.length}
           currentPage={this.state.currentPage + i - 1}
+          sendVideo={this.props.sendVideo}
         />,
       );
     }
@@ -173,7 +187,7 @@ class Lesson extends Component {
   }
 
   renderNextButton = () => {
-    if (this.state.pagesCompleted === 6) {
+    if (this.state.pagesCompleted) {
       return (
         <NextButton goToNext={this.goToNext} />
       );
@@ -202,6 +216,11 @@ class Lesson extends Component {
     this.setState({ intro: false });
   }
 
+  goToNextFromResultsPage = () => {
+    this.setState({ determiningCompletion: false });
+    this.props.resetAllCorrectness();
+  }
+
   render() {
     console.log('Lesson props', this.props);
     console.log('trying to render lesson with state: ', this.state);
@@ -227,10 +246,9 @@ class Lesson extends Component {
         pages = this.makePages();
       }
       console.log('currentPage', this.state.currentPage, 'pages', pages);
-      if (this.state.currentPage <= pages.length) {
+      if (this.state.currentPage <= pages.length && !this.state.determiningCompletion) {
         return (
           <div>
-            <RecordView />
             {pages[this.state.currentPage - 1]}
             {/* {pages[this.state.currentPage]}
             {pages[this.state.currentPage + 1]}
@@ -239,6 +257,20 @@ class Lesson extends Component {
             {pages[this.state.currentPage + 4]} */}
             {this.renderNextButton()}
           </div>
+        );
+      } else if (this.state.determiningCompletion && this.props.correctness.affectPercent !== -1) {
+        return (
+          <div>
+            <div>Timing Percent: {this.props.correctness.errorPercent} </div>
+            <div>Accuracy Percent: {this.props.correctness.accuracyPercent} </div>
+            <div>Affect Percent: {this.props.correctness.affectPercent} </div>
+            <div>Result: </div>
+            <button type="button" onClick={this.goToNextFromResultsPage}>Go to next</button>
+          </div>
+        );
+      } else if (this.state.determiningCompletion && this.props.correctness.affectPercent === -1) {
+        return (
+          <div>Calculating results...</div>
         );
       } else {
         return (
@@ -259,10 +291,23 @@ function mapStateToProps(reduxState) {
     return {
       user: reduxState.user,
       lesson: reduxState.lesson.currentLesson,
+      correctness: reduxState.correctness,
     };
   }
 }
 
 export default withRouter(connect(mapStateToProps, {
-  getLesson, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
+  getLesson,
+  assignXP,
+  sendVideo,
+  updateUserStats,
+  getRandomLesson,
+  registerLessonCompletion,
+  registerLessonAttempt,
+  getUserInfo,
+  updateLevel,
+  assignCoins,
+  getErrorPercent,
+  getAccuracyPercent,
+  resetAllCorrectness,
 })(Lesson));

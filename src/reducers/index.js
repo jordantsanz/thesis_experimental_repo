@@ -8,6 +8,7 @@ import lessonReducer from './lessonReducer';
 import classReducer from './classReducer';
 import betaAuthReducer from './betaAuthReducer';
 import RhythmReducer from './RhythmReducer';
+import correctnessReducer from './CorrectnessReducer';
 
 const rootReducer = combineReducers({
   user: userReducer, // user information like badges
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   class: classReducer,
   betaAuth: betaAuthReducer,
   rhythm: RhythmReducer,
+  correctness: correctnessReducer,
 });
 
 export default rootReducer;

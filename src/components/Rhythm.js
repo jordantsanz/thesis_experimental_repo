@@ -25,7 +25,7 @@ class Rhythm extends Component {
       success: null,
       correctnessArray: [],
       keyPresses: [],
-      accuracyArray: [],
+      accuracyArray: null,
       rerender: false,
       foundIndexes: [],
       rightAdjust: '12vw',
@@ -340,7 +340,6 @@ class Rhythm extends Component {
   checkAnswers = (cTimes, kPresses, final, playAnswer) => {
     let clickTimes = cTimes;
     let keyPresses = kPresses;
-    const { accuracyArray } = this.state;
     if (clickTimes === null) {
       clickTimes = this.state.clickTimes;
     }
@@ -354,6 +353,7 @@ class Rhythm extends Component {
     }
     if (clickTimes !== null) {
       const errorArray = [];
+      const accuracyArray = [];
       let success = true;
       const correctnessArray = [];
       const foundIndexes = [];
@@ -364,15 +364,23 @@ class Rhythm extends Component {
       // simple checking algorithm -- checks each note in order
       for (let i = 0; i < clickTimes.length; i += 1) {
         const userTime = clickTimes[i];
-        const correctTime = this.state.correctTimes[i].cumulativeTime;
+        const correctTime = this.state.correctTimes[i]?.cumulativeTime;
+        if (correctTime === undefined) {
+          break;
+        }
         const error = Math.abs(correctTime - userTime);
         errorArray.push(error);
-        accuracyArray.push(keyPresses[i] !== '' && keyPresses !== undefined && keyPresses !== this.state.correctTimes[i] ? 0 : 1);
         if (error > 350 || (keyPresses[i] !== '' && keyPresses[i] !== undefined && keyPresses[i] !== this.state.correctTimes[i].key)) {
           success = false;
           correctnessArray.push(0);
+          if (keyPresses[i] !== this.state.correctTimes[i].key) {
+            accuracyArray.push(0);
+          } else {
+            accuracyArray.push(1);
+          }
         } else {
           correctnessArray.push(1);
+          accuracyArray.push(1);
         }
       }
       console.log('correctnessArray in checkAnswers', correctnessArray);
@@ -380,19 +388,25 @@ class Rhythm extends Component {
       console.log('accuracy array', accuracyArray);
 
       if (final && !success) {
-        this.props.registerFailure(errorArray, correctnessArray);
+        this.props.registerCompletion(errorArray, accuracyArray);
         this.setState({ sentCompleted: true });
+        this.props.stopRecording();
+        console.log('on stop');
       } else if (final && success && !this.state.sentCompleted) {
         this.setState({ sentCompleted: true });
-        this.props.registerSuccess(errorArray, correctnessArray);
+        this.props.registerCompletion(errorArray, accuracyArray);
+        this.props.stopRecording();
+        console.log('on stop');
       }
       this.setState({
         success, errorArray, correctnessArray, rerender: true, foundIndexes, accuracyArray,
       });
       // }
     } else if (final && !playAnswer) {
-      this.props.registerFailure(this.state.errorArray, this.state.correctnessArray);
+      this.props.registerCompletion(this.state.errorArray, this.state.accuracyArray);
       this.setState({ sentCompleted: true });
+      this.props.stopRecording();
+      console.log('on stop');
     }
   }
 
@@ -533,6 +547,7 @@ class Rhythm extends Component {
   }
 
   attemptExercise = () => {
+    this.props.startRecording();
     this.setState({
       userAttempting: true, clickTimes: null, keyPresses: [], rerender: true, correctnessArray: [],
     });
@@ -648,6 +663,7 @@ class Rhythm extends Component {
     return (
       <div>
         <div className="rhythmPage">
+          {this.props.status}
           {/* <div className="instructions">
             {this.props.instructions}
             <br />

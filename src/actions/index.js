@@ -5,6 +5,7 @@ import axios from 'axios';
 // const ROOT_URL = 'https://warbler-ic-server.herokuapp.com/';
 
 import { generateRhythmActivity } from '../components/Random';
+import { calculateAccuracyPercent, calculateAffectPercent, calculateErrorPercent } from './CalculatePercentages';
 // eslint-disable-next-line no-unused-vars
 // import { generateRandomActivity } from '../components/published_components/lesson_creation_components/RandomActivityGenerator';
 // root url for local: change to #####-heroku.com/api
@@ -52,6 +53,10 @@ export const ActionTypes = {
   CLEAR_LESSONMAKING: 'CLEAR_LESSONMAKING',
   GO_TO_NEXT: 'GO_TO_NEXT',
   SET_ALL_QUESTIONS: 'SET_ALL_QUESTIONS',
+  GET_AFFECT: 'GET_AFFECT',
+  RESET_ALL_CORRECTNESS: 'RESET_ALL_CORRECTNESS',
+  GET_ACCURACY: 'GET_ACCURACY',
+  GET_ERROR_PERCENT: 'GET_ERROR_PERCENT',
 };
 
 // Remaking of lesson stuff.
@@ -71,14 +76,44 @@ export function makeContentPage(lessonid, fields) {
 }
 
 export function sendVideo(video) {
-  const formData = new FormData();
-  formData.append('video', video);
-  axios.post(`${ROOT_URL}/video`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }).then((res) => {
-    console.log(res);
+  return ((dispatch) => {
+    const formData = new FormData();
+    formData.append('video', video);
+    console.log('sending video');
+    axios.post(`${ROOT_URL}/video`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then((res) => {
+      console.log('response received', res);
+      const percent = calculateAffectPercent(res.data);
+      dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
+    });
+  });
+}
+
+export function resetAllCorrectness() {
+  console.log('reset all correctness in actions');
+  return ((dispatch) => {
+    dispatch({ type: ActionTypes.RESET_ALL_CORRECTNESS, payload: {} });
+  });
+}
+
+export function getErrorPercent(errorArray) {
+  console.log('get error percent in actions');
+  const percent = calculateErrorPercent(errorArray);
+  return ((dispatch) => {
+    console.log('dispatch error');
+    dispatch({ type: ActionTypes.GET_ERROR_PERCENT, payload: { errorPercent: percent } });
+  });
+}
+
+export function getAccuracyPercent(accuracyArray) {
+  console.log('get accuracy in actions');
+  const percent = calculateAccuracyPercent(accuracyArray);
+  return ((dispatch) => {
+    console.log('dispatch accuracy');
+    dispatch({ type: ActionTypes.GET_ACCURACY, payload: { accuracyPercent: percent } });
   });
 }
 
