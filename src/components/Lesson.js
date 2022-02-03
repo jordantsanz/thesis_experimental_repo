@@ -217,7 +217,7 @@ class Lesson extends Component {
   }
 
   goToNextFromResultsPage = () => {
-    this.setState({ determiningCompletion: false });
+    this.setState({ determiningCompletion: false, pagesCompleted: false });
     this.props.resetAllCorrectness();
   }
 
