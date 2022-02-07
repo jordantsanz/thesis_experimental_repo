@@ -43,8 +43,8 @@ const accuracyPercentRanges = {
   COMPLETELY_CORRECT: 1, // percent given for getting accuracy "perfect"
   PARTIALLY_CORRECT: 0.5, // percent given for getting accuracy partially correct
   NOT_CORRECT: 0, // percent given for getting accuracy not correct
-  PARTIAL_AND_NOT_BOUND: 0.3, // the bound to decide if not or partial; if less than 30% correct, not correct is given
-  COMPLETELY_AND_PARTIAL_BOUND: 0.7, // the bound to decide if completely or partial; if over 70% correct, completely correct amount is given
+  PARTIAL_AND_NOT_BOUND: 0.33, // the bound to decide if not or partial; if less than 30% correct, not correct is given
+  COMPLETELY_AND_PARTIAL_BOUND: 0.66, // the bound to decide if completely or partial; if over 70% correct, completely correct amount is given
 };
 const errorPercentRanges = {
   COMPLETELY_CORRECT: 1, // percent given for response in fastest range
@@ -59,11 +59,11 @@ const errorPercentRanges = {
 
 const affectPercentRanges = {
   NO_NEGATIVE_AFFECT_PERCENT: 1,
-  PARTIAL_NEGATIVE_AFFECT_PERCENT: 0.66,
-  MAJOR_NEGATIVE_AFFECT_PERCENT: 0.33,
+  PARTIAL_NEGATIVE_AFFECT_PERCENT: 0.5,
+  MAJOR_NEGATIVE_AFFECT_PERCENT: 0,
 
-  NO_NEGATIVE_AFFECT_UPPER_BOUND: 0.4,
-  PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND: 0.55,
+  NO_NEGATIVE_AFFECT_UPPER_BOUND: 0.33,
+  PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND: 0.66,
 
 };
 

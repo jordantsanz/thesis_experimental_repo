@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
+import Timer from 'react-compound-timer';
 import { TAP_VOLUME, METRONOME_VOLUME } from '../lib/constants';
 // import NextButton from './Exercises/NextButton';
 import VexNotes from './Vex';
@@ -18,7 +19,7 @@ class Rhythm extends Component {
       userAttempting: false,
       metronomeAudio: new Audio('https://aptitune.s3.amazonaws.com/metronomeClick.wav'),
       tapAudio: new Audio('https://aptitune.s3.amazonaws.com/click2.wav'),
-      clickTimes: null,
+      clickTimes: [],
       baselineTime: null,
       date: new Date(),
       errorArray: null,
@@ -200,7 +201,6 @@ class Rhythm extends Component {
     const colorArray = ['blue', 'green', 'red', 'purple'];
     const rand = parseInt(4 * Math.random(), 10);
     const color = colorArray[rand];
-    this.getPixelDimensions();
     if (this.state.vexNotes === null) {
       return (
         <div />
@@ -225,15 +225,6 @@ class Rhythm extends Component {
         </div>
       );
     }
-  }
-
-  getPixelDimensions = () => {
-    // const win = window;
-    // const doc = document;
-    // const docElem = doc.documentElement;
-    // const body = doc.getElementsByTagName('body')[0];
-    // const x = win.innerWidth || docElem.clientWidth || body.clientWidth;
-    // const y = win.innerHeight || docElem.clientHeight || body.clientHeight;
   }
 
   setMeasureCount = (count) => {
@@ -280,7 +271,7 @@ class Rhythm extends Component {
     if (!playAnswer) {
       window.addEventListener('keydown', this.handleKeyDown);
     }
-    this.setState({ clickTimes: null, baselineTime: null, playing: true });
+    this.setState({ clickTimes: [], baselineTime: null, playing: true });
     const intervalTime = 1000 / this.state.bps;
     const bpm = this.getBeatsPerMeasure();
     const introTime = intervalTime * bpm;
@@ -383,20 +374,33 @@ class Rhythm extends Component {
           accuracyArray.push(1);
         }
       }
-      console.log('correctnessArray in checkAnswers', correctnessArray);
-      console.log('errorArray', errorArray);
-      console.log('accuracy array', accuracyArray);
+      // const { length } = correctnessArray;
+      // if (!final) {
+      //   setTimeout(() => {
+      //     // no attempt in time
+      //     if (correctnessArray.length === length) {
+      //       const error = 300;
+      //       errorArray.push(error);
+      //       correctnessArray.push(0);
+      //       clickTimes.push(300);
+      //       this.setState({ errorArray, correctnessArray, clickTimes });
+      //     }
+      //   }, 300);
+      // }
+
+      if (final && correctnessArray.length !== this.state.durationArray.length) {
+        correctnessArray.push(0);
+        this.setState({ correctnessArray, rerender: true });
+      }
 
       if (final && !success) {
         this.props.registerCompletion(errorArray, accuracyArray);
         this.setState({ sentCompleted: true });
         this.props.stopRecording();
-        console.log('on stop');
       } else if (final && success && !this.state.sentCompleted) {
         this.setState({ sentCompleted: true });
         this.props.registerCompletion(errorArray, accuracyArray);
         this.props.stopRecording();
-        console.log('on stop');
       }
       this.setState({
         success, errorArray, correctnessArray, rerender: true, foundIndexes, accuracyArray,
@@ -406,7 +410,6 @@ class Rhythm extends Component {
       this.props.registerCompletion(this.state.errorArray, this.state.accuracyArray);
       this.setState({ sentCompleted: true });
       this.props.stopRecording();
-      console.log('on stop');
     }
   }
 
@@ -549,7 +552,7 @@ class Rhythm extends Component {
   attemptExercise = () => {
     this.props.startRecording();
     this.setState({
-      userAttempting: true, clickTimes: null, keyPresses: [], rerender: true, correctnessArray: [],
+      userAttempting: true, clickTimes: [], keyPresses: [], rerender: true, correctnessArray: [],
     });
     this.playMetronome(false);
   }
@@ -568,6 +571,38 @@ class Rhythm extends Component {
         <button type="button" onClick={this.playAnswer}>play answer</button>
       );
     }
+  }
+
+  checkIfInput = (index, time) => {
+    const { correctnessArray, clickTimes } = this.state;
+    if (this.state.correctnessArray.length < index) {
+      correctnessArray.push(0);
+      clickTimes.push(0);
+      this.setState({ correctnessArray, rerender: true, clickTimes });
+    }
+  }
+
+  getCumulativeChecks = () => {
+    const intervalTime = 1000 / this.state.bps;
+    const bpm = this.getBeatsPerMeasure();
+    const introTime = intervalTime * bpm;
+    const cumulativeArray = [300 + introTime];
+    const checkpointsArray = [];
+    if (this.state.durationArray === null) {
+      return [];
+    }
+    for (let i = 1; i < this.state.durationArray.length; i += 1) {
+      cumulativeArray.push(cumulativeArray[i - 1] + (this.state.durationArray[i - 1] * 1000));
+    }
+
+    for (let j = 0; j < cumulativeArray.length; j += 1) {
+      const checkpoint = {
+        time: cumulativeArray[j],
+        callback: () => { this.checkIfInput(j, cumulativeArray[j]); },
+      };
+      checkpointsArray.push(checkpoint);
+    }
+    return checkpointsArray;
   }
 
   renderGoButton = () => {
@@ -643,6 +678,20 @@ class Rhythm extends Component {
     this.props.goToNext(this.state.attempts, 'Rhythm-Sensing');
   }
 
+  renderTimer = () => {
+    if (this.state.userAttempting) {
+      return (
+        <Timer direction="forward"
+          checkpoints={this.getCumulativeChecks()}
+        >
+          <Timer.Milliseconds />
+        </Timer>
+      );
+    } else {
+      return <div />;
+    }
+  }
+
   // renderNextButton = () => {
   //   if (this.state.success && this.state.correctnessArray.length === this.state.durationArray.length) {
   //     return (
@@ -663,6 +712,7 @@ class Rhythm extends Component {
     return (
       <div>
         <div className="rhythmPage">
+          {this.renderTimer()}
           {this.props.status}
           {/* <div className="instructions">
             {this.props.instructions}

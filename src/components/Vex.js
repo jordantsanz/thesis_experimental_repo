@@ -330,7 +330,6 @@ class VexNotes extends Component {
     let anotherStaff = false;
     let i = 0;
     for (i; i < measures.length; i += 1) {
-      console.log('rendering measure ', i);
       if (i % 4 === 0 && i !== 0) {
         newLine = true;
         xLocation = 10;
@@ -360,11 +359,9 @@ class VexNotes extends Component {
           newLine = true;
         }
       } else {
-        console.log('making new staff in else');
         let staveMeasure;
         if (anotherStaff) {
           staveMeasure = new VF.Stave(xLocation, yLocation, measureWidth);
-          console.log('new line');
           staveMeasure.addClef(this.props.clef).addKeySignature(this.props.keySignature);
           anotherStaff = false;
         } else {
@@ -745,7 +742,6 @@ class VexNotes extends Component {
   }
 
   render() {
-    console.log('divid', this.props.divId);
     if (this.props.rerender) {
       this.renderVexFlow();
       this.props.rerenderComplete();

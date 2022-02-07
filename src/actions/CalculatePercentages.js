@@ -63,7 +63,7 @@ export const calculateAffectPercent = (affectDict) => {
   } = affectPercentRanges;
   const sum = Object.values(affectDict).reduce((a, b) => a + b);
   console.log(sum);
-  const percent = sum / 4;
+  const percent = sum;
   if (percent <= NO_NEGATIVE_AFFECT_UPPER_BOUND) {
     return NO_NEGATIVE_AFFECT_PERCENT;
   } else if (percent > PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND) {
