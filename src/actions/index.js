@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint-disable eqeqeq */
 import axios from 'axios';
@@ -12,6 +13,7 @@ import { calculateAccuracyPercent, calculateAffectPercent, calculateErrorPercent
 // const ROOT_URL = 'https://aptitune-api.herokuapp.com/api';
 // const ROOT_URL = 'http://localhost:9090/api';
 const ROOT_URL = 'http://localhost:5000';
+const ROOT_URL_DATABASE = 'http://localhost:9090/api';
 // action types
 export const ActionTypes = {
   BETA_AUTH: 'BETA_AUTH',
@@ -57,6 +59,7 @@ export const ActionTypes = {
   RESET_ALL_CORRECTNESS: 'RESET_ALL_CORRECTNESS',
   GET_ACCURACY: 'GET_ACCURACY',
   GET_ERROR_PERCENT: 'GET_ERROR_PERCENT',
+  SET_USER_HASH: 'SET_USER_HASH',
 };
 
 // Remaking of lesson stuff.
@@ -75,7 +78,8 @@ export function makeContentPage(lessonid, fields) {
   });
 }
 
-export function sendVideo(video) {
+export function sendVideo(video, id, lesson_id) {
+  console.log('actions send video', id);
   return ((dispatch) => {
     const formData = new FormData();
     formData.append('video', video);
@@ -87,8 +91,16 @@ export function sendVideo(video) {
     }).then((res) => {
       console.log('response received', res);
       const percent = calculateAffectPercent(res.data);
+      axios.put(`${ROOT_URL_DATABASE}/affect`, { percent, id, lesson_id });
       dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
     });
+  });
+}
+
+export function setUserHash(hash) {
+  axios.post(`${ROOT_URL_DATABASE}/newSubject`, { id: hash });
+  return ((dispatch) => {
+    dispatch({ type: ActionTypes.SET_USER_HASH, payload: { id: hash } });
   });
 }
 
@@ -99,18 +111,20 @@ export function resetAllCorrectness() {
   });
 }
 
-export function getErrorPercent(errorArray) {
-  console.log('get error percent in actions');
+export function getErrorPercent(errorArray, id, lesson_id) {
+  console.log('get error percent in actions', id);
   const percent = calculateErrorPercent(errorArray);
+  axios.put(`${ROOT_URL_DATABASE}/error`, { percent, id, lesson_id });
   return ((dispatch) => {
     console.log('dispatch error');
     dispatch({ type: ActionTypes.GET_ERROR_PERCENT, payload: { errorPercent: percent } });
   });
 }
 
-export function getAccuracyPercent(accuracyArray) {
-  console.log('get accuracy in actions');
+export function getAccuracyPercent(accuracyArray, id, lesson_id) {
+  console.log('get accuracy in actions', id);
   const percent = calculateAccuracyPercent(accuracyArray);
+  axios.put(`${ROOT_URL_DATABASE}/accuracy`, { percent, id, lesson_id });
   return ((dispatch) => {
     console.log('dispatch accuracy');
     dispatch({ type: ActionTypes.GET_ACCURACY, payload: { accuracyPercent: percent } });

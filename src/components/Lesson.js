@@ -21,10 +21,10 @@ const Page = (props) => {
     console.log('in stopped');
     const myFile = new File(
       [blob],
-      'name.mp4',
+      `${props.id}.mp4`,
       { type: 'video/mp4' },
     );
-    props.sendVideo(myFile);
+    props.sendVideo(myFile, props.id);
   };
   const {
     startRecording,
@@ -125,8 +125,8 @@ class Lesson extends Component {
 
   registerCompletion = (errorArray, accuracyArray) => {
     console.log('register completion called');
-    this.props.getErrorPercent(errorArray);
-    this.props.getAccuracyPercent(accuracyArray);
+    this.props.getErrorPercent(errorArray, this.props.correctness.id);
+    this.props.getAccuracyPercent(accuracyArray, this.props.correctness.id);
     this.setState({ pagesCompleted: true });
   }
 
@@ -176,6 +176,7 @@ class Lesson extends Component {
           pageCount={lesson.pages.length}
           currentPage={this.state.currentPage + i - 1}
           sendVideo={this.props.sendVideo}
+          id={this.props.correctness.id}
         />,
       );
     }

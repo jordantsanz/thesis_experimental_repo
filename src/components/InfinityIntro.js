@@ -4,7 +4,9 @@
 /* eslint-disable react/prefer-stateless-function */
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router-dom';
+import { setUserHash } from '../actions';
 
 class InfinityIntro extends Component {
   constructor(props) {
@@ -20,8 +22,17 @@ class InfinityIntro extends Component {
     this.setState({ clef });
   }
 
+  componentDidMount = () => {
+    this.setRandomHash();
+  }
+
   begin = () => {
     this.props.begin('rhythm', this.state.clef);
+  }
+
+  setRandomHash = () => {
+    const hash = uuidv4();
+    this.props.setUserHash(hash);
   }
 
   renderError = () => {
@@ -69,4 +80,4 @@ function mapStateToProps(reduxState) {
   }
 }
 
-export default withRouter(connect(mapStateToProps, {})(InfinityIntro));
+export default withRouter(connect(mapStateToProps, { setUserHash })(InfinityIntro));

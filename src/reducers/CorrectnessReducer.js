@@ -4,6 +4,7 @@ const initialState = {
   affectPercent: -1,
   accuracyPercent: -1,
   errorPercent: -1,
+  id: '',
 };
 
 const correctnessReducer = (state = initialState, action) => {
@@ -33,6 +34,12 @@ const correctnessReducer = (state = initialState, action) => {
       return {
         ...state,
         errorPercent: action.payload.errorPercent,
+      };
+    case ActionTypes.SET_USER_HASH:
+      console.log('set user hash called');
+      return {
+        ...state,
+        id: action.payload.id,
       };
     default:
       return state;

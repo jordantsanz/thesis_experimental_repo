@@ -388,18 +388,18 @@ class Rhythm extends Component {
       //   }, 300);
       // }
 
-      if (final && correctnessArray.length !== this.state.durationArray.length) {
+      if (final && correctnessArray.length < this.state.durationArray.length) {
         correctnessArray.push(0);
         this.setState({ correctnessArray, rerender: true });
       }
 
       if (final && !success) {
-        this.props.registerCompletion(errorArray, accuracyArray);
+        this.props.registerCompletion(errorArray, correctnessArray);
         this.setState({ sentCompleted: true });
         this.props.stopRecording();
       } else if (final && success && !this.state.sentCompleted) {
         this.setState({ sentCompleted: true });
-        this.props.registerCompletion(errorArray, accuracyArray);
+        this.props.registerCompletion(errorArray, correctnessArray);
         this.props.stopRecording();
       }
       this.setState({
@@ -407,7 +407,7 @@ class Rhythm extends Component {
       });
       // }
     } else if (final && !playAnswer) {
-      this.props.registerCompletion(this.state.errorArray, this.state.accuracyArray);
+      this.props.registerCompletion(this.state.errorArray, this.state.correctnessArray);
       this.setState({ sentCompleted: true });
       this.props.stopRecording();
     }
