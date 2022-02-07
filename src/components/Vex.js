@@ -84,6 +84,7 @@ class VexNotes extends Component {
         const measure = measures[j];
         // loop through each note in the measure
         for (let i = 0; i < measure.length; i += 1) {
+          console.log(this.props.correctnessArray.length, 'length of c array', noteCount, 'notecount');
           const note = measure[i];
           const hasTie = this.hasTie(note, ties);
           if (tieColor !== null) {
@@ -108,8 +109,16 @@ class VexNotes extends Component {
                   tieColor = null;
                 }
               }
-              noteCount += 1;
+            } else if (this.props.correctnessArray.length === noteCount) {
+              console.log('set style');
+              note.setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
+              if (hasTie) {
+                tieColor = 'yellow';
+              } else {
+                tieColor = null;
+              }
             }
+            noteCount += 1;
           }
         }
       }
