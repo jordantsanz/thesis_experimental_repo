@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable no-plusplus */
@@ -7,6 +8,18 @@ import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router-dom';
 import { setUserHash } from '../actions';
+import pic4 from '../images/4-4.png';
+import eighth from '../images/eighth.png';
+import fkey from '../images/f-key.png';
+import fkehalf from '../images/f-key-half.png';
+import half from '../images/half.png';
+import jkey from '../images/j-key-two.png';
+import jkey2 from '../images/j-key.png';
+import measure from '../images/measure.png';
+import percu from '../images/percussion.png';
+import quar from '../images/quarter.png';
+import treb from '../images/treble.png';
+import whol from '../images/whole.png';
 
 class InfinityIntro extends Component {
   constructor(props) {

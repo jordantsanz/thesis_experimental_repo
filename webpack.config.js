@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const env = process.env.NODE_ENV || 'development';
 const autoprefixer = require('autoprefixer');
@@ -74,6 +75,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './src/index.html',
       filename: './200.html',
+    }),
+    new CopyPlugin({
+      patterns: [
+        { from: 'src/images', to: 'images' },
+      ],
     }),
   ],
   devServer: {
