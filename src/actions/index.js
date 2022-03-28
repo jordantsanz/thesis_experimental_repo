@@ -16,9 +16,9 @@ const ROOT_URL = 'http://localhost:5000';
 
 // url for database
 // LOCAL:
-const ROOT_URL_DATABASE = 'http://localhost:9090/api';
+// const ROOT_URL_DATABASE = 'http://localhost:9090/api';
 // PROD:
-// const ROOT_URL_DATABASE = 'https://jsanz-thesis-database.herokuapp.com/api';
+const ROOT_URL_DATABASE = 'https://jsanz-thesis-database.herokuapp.com/api';
 // action types
 export const ActionTypes = {
   BETA_AUTH: 'BETA_AUTH',

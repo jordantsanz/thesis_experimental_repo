@@ -52,7 +52,7 @@ const errorPercentRanges = {
   PARTIALLY_CORRECT: 0.25, // percent given for response in third fastest range
   NOT_CORRECT: 0, // percent given for response slower than third fastest range
 
-  COMPLETELY_CORRECT_UPPER_BOUND: 100, // bound from 0ms - xms for completely correct to be administered, where completely_correct_upper_bound = x
+  COMPLETELY_CORRECT_UPPER_BOUND: 150, // bound from 0ms - xms for completely correct to be administered, where completely_correct_upper_bound = x
   VERY_CORRECT_UPPER_BOUND: 200, // bound from completely_corect_upper_bound ms - x ms for very correct to be administered, where very_correct_upper_bound = x
   PARTIALLY_CORRECT_UPPER_BOUND: 300, // bound from very_correct_upper_bound ms - x ms for partially correct to be adminsitered, where partially_correct_upper_bound = x
 };
@@ -69,6 +69,12 @@ const affectPercentRanges = {
 const resultPercentRanges = {
   REPEAT_SLOWER_BOUND: 0.32,
   REPEAT_SAME_BOUND: 0.66,
+};
+
+const resultWords = {
+  VERY_GOOD_UPPER_BOUND: 0.51,
+  GOOD_LOWER_BOUND: 0.4,
+  AVERAGE_LOWER_BOUND: 0.25,
 };
 
 const bpmChoices = {
@@ -92,4 +98,5 @@ export {
   errorPercentRanges,
   affectPercentRanges,
   resultPercentRanges,
+  resultWords,
 };

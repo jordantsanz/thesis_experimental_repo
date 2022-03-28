@@ -12,7 +12,7 @@ import {
 } from '../actions';
 import ViewContent from './ViewContent';
 import NextButton from './Exercises/NextButton';
-import { resultPercentRanges } from '../lib/constants';
+import { resultPercentRanges, resultWords } from '../lib/constants';
 import Rhythm from './Rhythm';
 import InfinityIntro from './InfinityIntro';
 
@@ -54,7 +54,7 @@ const Page = (props) => {
           notes={props.page.info.r.notes}
           timeSignature={props.page.info.r.time_signature}
           keys={props.page.info.r.keys}
-          bpm={props.halfSpeed ? 60 : props.page.info.r.bpm}
+          bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
           goToNext={props.goToNext}
           lives={props.lives}
           registerCompletion={props.registerCompletion}
@@ -237,11 +237,11 @@ class Lesson extends Component {
   goToNextFromResultsPage = () => {
     const result = this.determineResultType();
     if (result === 'continue') {
-      this.setState((prevState) => ({ currentPage: prevState.currentPage + 1, attempt: 0 }));
+      this.setState((prevState) => ({ currentPage: prevState.currentPage + 1, attempt: 0, halfSpeed: false }));
     } else if (result === 'repeat_slower') {
       this.setState((prevState) => ({ attempt: prevState.attempt + 1, halfSpeed: true }));
     } else {
-      this.setState((prevState) => ({ attempt: prevState.attempt + 1 }));
+      this.setState((prevState) => ({ attempt: prevState.attempt + 1, halfSpeed: false }));
     }
     this.setState({ determiningCompletion: false, pagesCompleted: false });
     this.props.resetAllCorrectness();
@@ -274,7 +274,25 @@ class Lesson extends Component {
     }
   }
 
+  determineResultWord = (percent) => {
+    if (percent >= resultWords.VERY_GOOD_UPPER_BOUND) {
+      return 'Great!';
+    }
+    if (percent >= resultWords.GOOD_LOWER_BOUND) {
+      return 'Good';
+    }
+    if (percent >= resultWords.AVERAGE_LOWER_BOUND) {
+      return 'Average';
+    }
+    return 'Below Average';
+  }
+
   render() {
+    if (this.state.currentPage > 20) {
+      return (
+        <div>End: Need to give amazon code now, but not sure how this works yet.</div>
+      );
+    }
     if (this.state.intro && this.state.random) {
       return (
         <InfinityIntro begin={this.beginInfinityLesson} />
@@ -321,7 +339,8 @@ class Lesson extends Component {
             <div className="rt-center">
               <div className="rt-lesson-subtitle">Activity</div>
             </div>
-            {pages[this.state.currentPage - 1]}
+            {/* {pages[this.state.currentPage - 1]} */}
+            {pages[15]}
             {this.renderNextButton()}
           </div>
         );
@@ -332,9 +351,9 @@ class Lesson extends Component {
             <div className="infinity-body rt-results-page">
               <div className="infinity-title infinity-title-top">Results</div>
               <ul className="rt-results-inner">
-                <li className="rt-result">Timing Percent: {this.props.correctness.errorPercent} </li>
+                <li className="rt-result">Timing Percent: {this.determineResultWord(this.props.correctness.errorPercent)} </li>
                 <br />
-                <li className="rt-result">Accuracy Percent: {this.props.correctness.accuracyPercent} </li>
+                <li className="rt-result">Accuracy Percent: {this.determineResultWord(this.props.correctness.accuracyPercent)} </li>
                 <br />
                 {/* <li className="rt-result">Affect Percent: {this.props.correctness.affectPercent} </li> */}
                 <br />

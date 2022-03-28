@@ -464,7 +464,7 @@ class Rhythm extends Component {
     // spacebar click
     if (event.code === 'Space' && this.state.userAttempting) {
       this.lightSpaceBar();
-      this.state.bassAudio.volume = TAP_VOLUME;
+      this.state.bassAudio.volume = TAP_VOLUME + 0.2;
       this.state.bassAudio.currenttime = 0;
       this.state.bassAudio.play();
       const timeClicked = d.getTime();
@@ -724,7 +724,9 @@ class Rhythm extends Component {
           <div className="rhythm-f" id="rhythm-f">
             F
           </div>
-          <div className="rhythm-spacebar" id="rhythm-spacebar" />
+          <div className="rhythm-spacebar" id="rhythm-spacebar">
+            Spacebar
+          </div>
           <div className="rhythm-j" id="rhythm-j">
             J
           </div>

@@ -20,6 +20,7 @@ import percu from '../images/percussion.png';
 import quar from '../images/quarter.png';
 import treb from '../images/treble.png';
 import whol from '../images/whole.png';
+import RecordView from './RecordView';
 
 class InfinityIntro extends Component {
   constructor(props) {
@@ -70,6 +71,7 @@ class InfinityIntro extends Component {
     console.log('inf props', this.props);
     return (
       <div className="infinity">
+        <RecordView />
         <div className="infinity-body">
           <div className="infinity-title infinity-title-top">Learning Drum Notation</div>
           <ul className="rt-intro-text-holder-list">
@@ -105,6 +107,9 @@ class InfinityIntro extends Component {
             <ul className="rt-intro-text-holder-list">
               <div className="rt-bold">Other notes:</div>
               <br />
+              <li className="rt-intro-text">
+                Please enable microphone and camera access.
+              </li>
               <li className="rt-intro-text">
                 Turn your sound on. Do not use bluetooth headphones. Try wired headphones or play sounds on your computer speakers.
               </li>

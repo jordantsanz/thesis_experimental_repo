@@ -331,7 +331,7 @@ class VexNotes extends Component {
     const sizeArr = this.getWindowDimensions(notesArray);
     const x = sizeArr[0];
     const y = sizeArr[1];
-    renderer.resize(x + 200, y);
+    renderer.resize(x + 300, y);
 
     const context = renderer.getContext();
 
@@ -422,9 +422,6 @@ class VexNotes extends Component {
   }
 
   getWindowDimensions = (measures) => {
-    if (this.props.mode === 'sightreading') {
-      return [1300, this.state.rowHeight];
-    }
     let width = 0;
     for (let i = 0; i < measures.length; i += 1) {
       if (i === 0) {
