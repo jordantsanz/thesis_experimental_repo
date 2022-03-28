@@ -7,24 +7,26 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
 import {
-  getLesson, getErrorPercent,
+  getLesson, getErrorPercent, createNewAttempt,
   resetAllCorrectness, getAccuracyPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
 import NextButton from './Exercises/NextButton';
+import { resultPercentRanges } from '../lib/constants';
 import Rhythm from './Rhythm';
 import InfinityIntro from './InfinityIntro';
 
 const Page = (props) => {
+  console.log('thepageprops', props);
   const stopped = (url, blob) => {
     console.log(blob);
     console.log('in stopped');
     const myFile = new File(
       [blob],
-      `${props.id}.mp4`,
+      `${props.id}-${props.lesson_id}-${props.attempt}.mp4`,
       { type: 'video/mp4' },
     );
-    props.sendVideo(myFile, props.id);
+    props.sendVideo(myFile, props.id, props.lesson_id, props.attempt);
   };
   const {
     startRecording,
@@ -52,7 +54,7 @@ const Page = (props) => {
           notes={props.page.info.r.notes}
           timeSignature={props.page.info.r.time_signature}
           keys={props.page.info.r.keys}
-          bpm={props.page.info.r.bpm}
+          bpm={props.halfSpeed ? 60 : props.page.info.r.bpm}
           goToNext={props.goToNext}
           lives={props.lives}
           registerCompletion={props.registerCompletion}
@@ -62,6 +64,7 @@ const Page = (props) => {
           changePage={props.changePage}
           pageCount={props.pageCount}
           currentPage={props.currentPage}
+          makeNewAttempt={props.makeNewAttempt}
         />
       );
     }
@@ -99,11 +102,13 @@ class Lesson extends Component {
       lives: -1,
       random: true,
       xp: 0,
-      coins: 0,
       intro: true,
       pages: null,
+      instructionPages: null,
       pagesCompleted: false,
       determiningCompletion: false,
+      attempt: 0,
+      halfSpeed: false,
     };
   }
 
@@ -124,16 +129,21 @@ class Lesson extends Component {
   }
 
   registerCompletion = (errorArray, accuracyArray) => {
-    console.log('register completion called');
-    this.props.getErrorPercent(errorArray, this.props.correctness.id);
-    this.props.getAccuracyPercent(accuracyArray, this.props.correctness.id);
+    console.log('register completion called', errorArray, accuracyArray);
+    this.props.getErrorPercent(errorArray, this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
+    this.props.getAccuracyPercent(accuracyArray, this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
     this.setState({ pagesCompleted: true });
+  }
+
+  makeNewAttempt = () => {
+    console.log('make new attempt called');
+    this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
   }
 
   goToNext = (attempts, type) => {
     console.log('going to next!');
     if (this.props.type === 'preview') {
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: true, determiningCompletion: true }));
+      this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
     } else {
       console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
@@ -142,12 +152,13 @@ class Lesson extends Component {
         }
         this.props.getUserInfo();
       }
-      this.setState((prevstate) => ({ currentPage: prevstate.currentPage + 6, pagesCompleted: true, determiningCompletion: true }));
+      this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
       console.log('finished going to next');
     }
   }
 
   makePages = () => {
+    console.log('making pages');
     const { lesson } = this.props;
     // if (this.props.type === 'preview') {
     //   lesson = this.props.lessonMaking;
@@ -155,6 +166,7 @@ class Lesson extends Component {
     // }
     console.log('the lesson', lesson);
     const pagesList = [];
+    const instructionPagesList = [];
 
     for (let i = 0; i < lesson.pages.length; i++) {
       // console.log('in loop with page', lesson.pages[i]);
@@ -163,6 +175,7 @@ class Lesson extends Component {
       pagesList.push(
         <Page
           percentage={percentage}
+          lesson_id={lesson.pages[i].lesson_id}
           xp={this.state.xp}
           page={lesson.pages[i]}
           key={i}
@@ -177,10 +190,14 @@ class Lesson extends Component {
           currentPage={this.state.currentPage + i - 1}
           sendVideo={this.props.sendVideo}
           id={this.props.correctness.id}
+          halfSpeed={this.state.halfSpeed}
+          attempt={this.state.attempt}
+          makeNewAttempt={this.makeNewAttempt}
         />,
       );
+      instructionPagesList.push(lesson.pages[i].instructionPage);
     }
-    return pagesList;
+    return [pagesList, instructionPagesList];
   }
 
   changePage = (n) => {
@@ -218,15 +235,47 @@ class Lesson extends Component {
   }
 
   goToNextFromResultsPage = () => {
+    const result = this.determineResultType();
+    if (result === 'continue') {
+      this.setState((prevState) => ({ currentPage: prevState.currentPage + 1, attempt: 0 }));
+    } else if (result === 'repeat_slower') {
+      this.setState((prevState) => ({ attempt: prevState.attempt + 1, halfSpeed: true }));
+    } else {
+      this.setState((prevState) => ({ attempt: prevState.attempt + 1 }));
+    }
     this.setState({ determiningCompletion: false, pagesCompleted: false });
     this.props.resetAllCorrectness();
   }
 
+  determineResult = () => {
+    // ! Use this for facial affect version
+    // const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.affectPercent + this.props.correctness.accuracyPercent) / 3;
+
+    const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.accuracyPercent) / 2;
+    if (avgPercent <= resultPercentRanges.REPEAT_SLOWER_BOUND) {
+      return 'Repeat again, but slower this time.';
+    } else if (avgPercent <= resultPercentRanges.REPEAT_SAME_BOUND) {
+      return 'Try this again at the same speed.';
+    } else {
+      return 'Nice job! Let\'s move onto the next section.';
+    }
+  }
+
+  determineResultType = () => {
+    // ! Use this for facial affect version
+    // const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.affectPercent + this.props.correctness.accuracyPercent) / 3;
+    const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.accuracyPercent) / 2;
+    if (avgPercent <= resultPercentRanges.REPEAT_SLOWER_BOUND) {
+      return 'repeat_slower';
+    } else if (avgPercent <= resultPercentRanges.REPEAT_SAME_BOUND) {
+      return 'repeat_same';
+    } else {
+      return 'continue';
+    }
+  }
+
   render() {
-    console.log('Lesson props', this.props);
-    console.log('trying to render lesson with state: ', this.state);
     if (this.state.intro && this.state.random) {
-      console.log('rendering infinity intro');
       return (
         <InfinityIntro begin={this.beginInfinityLesson} />
       );
@@ -241,37 +290,73 @@ class Lesson extends Component {
         <div />
       );
     } else {
-      console.log('props in lesson', this.props);
-      let { pages } = this.state;
+      let { pages, instructionPages } = this.state;
       if (this.state.pages === null) {
-        pages = this.makePages();
+        [pages, instructionPages] = this.makePages();
       }
       console.log('currentPage', this.state.currentPage, 'pages', pages);
       if (this.state.currentPage <= pages.length && !this.state.determiningCompletion) {
         return (
           <div>
+            <div className="page-text-instructions">
+              <div className="rt-page-text-left">
+                <div className="rt-lesson-name">Lesson {this.state.currentPage}</div>
+              </div>
+
+              <div className="rt-lesson-title">{instructionPages[this.state.currentPage - 1].title}</div>
+              <br />
+              <div className="rt-inner">
+                <ul className="rt-text-col">
+                  <li className="rt-lesson-text-1">{instructionPages[this.state.currentPage - 1].text1}</li>
+                  <br />
+                  <li className="rt-lesson-text-2">{instructionPages[this.state.currentPage - 1].text2}</li>
+                  <br />
+                  <li className="rt-lesson-text-3">{instructionPages[this.state.currentPage - 1].text3}</li>
+                </ul>
+                {instructionPages[this.state.currentPage - 1].hasImage
+                  ? <img alt="for-lesson-guidance" className="rt-lesson-img" src={instructionPages[this.state.currentPage - 1].image} />
+                  : null}
+              </div>
+            </div>
+            <div className="rt-center">
+              <div className="rt-lesson-subtitle">Activity</div>
+            </div>
             {pages[this.state.currentPage - 1]}
-            {/* {pages[this.state.currentPage]}
-            {pages[this.state.currentPage + 1]}
-            {pages[this.state.currentPage + 2]}
-            {pages[this.state.currentPage + 3]}
-            {pages[this.state.currentPage + 4]} */}
             {this.renderNextButton()}
           </div>
         );
-      } else if (this.state.determiningCompletion && this.props.correctness.affectPercent !== -1) {
+        ///  NEED TO CHANGE FOR REAL: should be facialAffect !== -1 for face condition
+      } else if (this.state.determiningCompletion && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1) {
         return (
-          <div>
-            <div>Timing Percent: {this.props.correctness.errorPercent} </div>
-            <div>Accuracy Percent: {this.props.correctness.accuracyPercent} </div>
-            <div>Affect Percent: {this.props.correctness.affectPercent} </div>
-            <div>Result: </div>
-            <button type="button" onClick={this.goToNextFromResultsPage}>Go to next</button>
+          <div className="infinity">
+            <div className="infinity-body rt-results-page">
+              <div className="infinity-title infinity-title-top">Results</div>
+              <ul className="rt-results-inner">
+                <li className="rt-result">Timing Percent: {this.props.correctness.errorPercent} </li>
+                <br />
+                <li className="rt-result">Accuracy Percent: {this.props.correctness.accuracyPercent} </li>
+                <br />
+                {/* <li className="rt-result">Affect Percent: {this.props.correctness.affectPercent} </li> */}
+                <br />
+                <br />
+                <br />
+                <br />
+                <div className="rt-final-result">Result: {this.determineResult()}</div>
+              </ul>
+
+              <div className="inf-play-holder" onClick={this.goToNextFromResultsPage}>
+                <button className="inf-play green" type="button">Next lesson</button>
+              </div>
+            </div>
           </div>
         );
       } else if (this.state.determiningCompletion && this.props.correctness.affectPercent === -1) {
         return (
-          <div>Calculating results...</div>
+          <div className="infinity">
+            <div className="infinity-body rt-results-page">
+              <div className="infinity-title infinity-title-top">Calculating Results...do NOT refresh!</div>
+            </div>
+          </div>
         );
       } else {
         return (
@@ -311,4 +396,5 @@ export default withRouter(connect(mapStateToProps, {
   getErrorPercent,
   getAccuracyPercent,
   resetAllCorrectness,
+  createNewAttempt,
 })(Lesson));

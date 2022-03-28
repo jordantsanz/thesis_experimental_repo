@@ -600,7 +600,7 @@ function pickActivityType(types) {
   return activityType;
 }
 
-export function generateRhythmActivity() {
+export function generateRhythmActivity(i) {
   // console.log('generateRhythmActivity called');
   /*
     Inputs:
@@ -629,6 +629,7 @@ export function generateRhythmActivity() {
   const bpm = generateRandomBPM(); // generateRandomBPM();
   const output = {
     page_type: 'random_activity',
+    lesson_id: i,
     info: {
       activity_type: 'Rhythm-Sensing',
       r: {

@@ -52,8 +52,13 @@ export const calculateErrorPercent = (errorArray) => {
   }
 
   const percent = totalScore / totalNotes;
-  console.log('error percent:', percent);
-  return percent;
+  if (percent <= accuracyPercentRanges.PARTIAL_AND_NOT_BOUND) {
+    return accuracyPercentRanges.NOT_CORRECT;
+  } else if (percent <= accuracyPercentRanges.COMPLETELY_AND_PARTIAL_BOUND) {
+    return accuracyPercentRanges.PARTIALLY_CORRECT;
+  } else {
+    return accuracyPercentRanges.COMPLETELY_CORRECT;
+  }
 };
 
 export const calculateAffectPercent = (affectDict) => {

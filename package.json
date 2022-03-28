@@ -29,9 +29,9 @@
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server",
     "test": "./node_modules/.bin/eslint src",
-    "build": "yarn clean; NODE_ENV=production webpack --colors; cp -f _redirects dist/",
+    "build": "yarn clean; NODE_ENV=production webpack --colors; cp -f dist/",
     "clean": "rimraf dist",
-    "deploy": "yarn build; surge -p dist -d https://warblermusic.surge.sh; yarn clean"
+    "deploy": "yarn build; surge -p dist -d https://jsanz-thesis.surge.sh; yarn clean"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -49,14 +49,14 @@
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.0.8",
-    "file-loader": "^6.0.0",
+    "file-loader": "^6.2.0",
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.14.1",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^9.0.2",
     "style-loader": "^1.2.1",
-    "surge": "^0.21.6",
+    "surge": "^0.23.1",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"

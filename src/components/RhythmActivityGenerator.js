@@ -232,6 +232,7 @@ export default async function generateRhythmActivity(i, difficulty) {
   const output = {
     page_type: 'random_activity',
     answerCount: -1,
+    lesson_id: i,
     currentNumber: i + 1,
     title: 'Press the space bar to the correct rhythm!',
     info: {
@@ -246,6 +247,8 @@ export default async function generateRhythmActivity(i, difficulty) {
       },
     },
   };
+
+  console.log(output.lesson_id, 'output lesson id');
 
   // questions.push(output);
   //   }

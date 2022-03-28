@@ -64,7 +64,11 @@ const affectPercentRanges = {
 
   NO_NEGATIVE_AFFECT_UPPER_BOUND: 0.33,
   PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND: 0.66,
+};
 
+const resultPercentRanges = {
+  REPEAT_SLOWER_BOUND: 0.32,
+  REPEAT_SAME_BOUND: 0.66,
 };
 
 const bpmChoices = {
@@ -87,4 +91,5 @@ export {
   accuracyPercentRanges,
   errorPercentRanges,
   affectPercentRanges,
+  resultPercentRanges,
 };

@@ -5,15 +5,20 @@ import axios from 'axios';
 // const ROOT_URL = 'https://warblermusic.herokuapp.com/api';
 // const ROOT_URL = 'https://warbler-ic-server.herokuapp.com/';
 
-import { generateRhythmActivity } from '../components/Random';
+// import { generateRhythmActivity } from '../components/Random';
 import { calculateAccuracyPercent, calculateAffectPercent, calculateErrorPercent } from './CalculatePercentages';
-// eslint-disable-next-line no-unused-vars
-// import { generateRandomActivity } from '../components/published_components/lesson_creation_components/RandomActivityGenerator';
-// root url for local: change to #####-heroku.com/api
-// const ROOT_URL = 'https://aptitune-api.herokuapp.com/api';
-// const ROOT_URL = 'http://localhost:9090/api';
+import premadeLessons from '../lib/PremadeLessons';
+// url for face detection
+// LOCAL:
 const ROOT_URL = 'http://localhost:5000';
+// PROD:
+// const ROOT_URL = 'https://jsanz-thesis-backend.uk.r.appspot.com';
+
+// url for database
+// LOCAL:
 const ROOT_URL_DATABASE = 'http://localhost:9090/api';
+// PROD:
+// const ROOT_URL_DATABASE = 'https://jsanz-thesis-database.herokuapp.com/api';
 // action types
 export const ActionTypes = {
   BETA_AUTH: 'BETA_AUTH',
@@ -78,7 +83,7 @@ export function makeContentPage(lessonid, fields) {
   });
 }
 
-export function sendVideo(video, id, lesson_id) {
+export function sendVideo(video, id, lesson_id, attempt) {
   console.log('actions send video', id);
   return ((dispatch) => {
     const formData = new FormData();
@@ -91,7 +96,9 @@ export function sendVideo(video, id, lesson_id) {
     }).then((res) => {
       console.log('response received', res);
       const percent = calculateAffectPercent(res.data);
-      axios.put(`${ROOT_URL_DATABASE}/affect`, { percent, id, lesson_id });
+      axios.put(`${ROOT_URL_DATABASE}/affect`, {
+        percent, id, lesson_id, attempt, dataframe: res.data,
+      });
       dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
     });
   });
@@ -104,6 +111,12 @@ export function setUserHash(hash) {
   });
 }
 
+export function createNewAttempt(id, lesson_id, attempt) {
+  axios.post(`${ROOT_URL_DATABASE}/newattempt`, {
+    id, lesson_id, attempt, isControl: true,
+  });
+}
+
 export function resetAllCorrectness() {
   console.log('reset all correctness in actions');
   return ((dispatch) => {
@@ -111,20 +124,25 @@ export function resetAllCorrectness() {
   });
 }
 
-export function getErrorPercent(errorArray, id, lesson_id) {
+export function getErrorPercent(errorArray, id, lesson_id, attempt) {
   console.log('get error percent in actions', id);
   const percent = calculateErrorPercent(errorArray);
-  axios.put(`${ROOT_URL_DATABASE}/error`, { percent, id, lesson_id });
+  axios.put(`${ROOT_URL_DATABASE}/error`, {
+    percent, id, lesson_id, attempt,
+  });
   return ((dispatch) => {
     console.log('dispatch error');
     dispatch({ type: ActionTypes.GET_ERROR_PERCENT, payload: { errorPercent: percent } });
   });
 }
 
-export function getAccuracyPercent(accuracyArray, id, lesson_id) {
+export function getAccuracyPercent(accuracyArray, id, lesson_id, attempt) {
   console.log('get accuracy in actions', id);
   const percent = calculateAccuracyPercent(accuracyArray);
-  axios.put(`${ROOT_URL_DATABASE}/accuracy`, { percent, id, lesson_id });
+
+  axios.put(`${ROOT_URL_DATABASE}/accuracy`, {
+    percent, id, lesson_id, attempt,
+  });
   return ((dispatch) => {
     console.log('dispatch accuracy');
     dispatch({ type: ActionTypes.GET_ACCURACY, payload: { accuracyPercent: percent } });
@@ -141,7 +159,7 @@ export function makeActivityPage(lessonid, fields) {
   });
 }
 
-// SHANE MAKING LESSONS
+//  MAKING LESSONS
 export function startMakingActivity(activityType) {
   return ((dispatch) => {
     console.log('started making activity.');
@@ -534,13 +552,17 @@ export function registerLessonCompletion(lessonID, userID) {
 
 export function getRandomLesson(history, types, clef) {
   // call createRandomActivity 100 times and store in []
-  console.log('getRandomLesson called');
-  const arr = [];
-  for (let i = 0; i < 100; i += 1) {
-    arr.push(generateRhythmActivity(1, 'easy'));
-  }
-  const json = { pages: arr, title: 'random' };
-  console.log('json created,', json);
+  // console.log('getRandomLesson called');
+  // const arr = [];
+  // for (let i = 0; i < 100; i += 1) {
+  //   arr.push(generateRhythmActivity(i, 'easy'));
+  // }
+  // const json = { pages: arr, title: 'random' };
+  // console.log('json created,', json);
+
+  const arr2 = premadeLessons;
+  console.log({ arr2 });
+  const json = { pages: arr2, title: 'random' };
 
   return (dispatch) => {
     console.log('dispatch run');

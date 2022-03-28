@@ -28,23 +28,23 @@ class VexNotes extends Component {
   componentDidMount = () => {
     this.renderVexFlow();
     // this.rerenderNotes();
-    document.addEventListener('keypress', (event) => {
-      if (event.code === 'KeyM') {
-        // eslint-disable-next-line react/no-access-state-in-setstate
-        const noteArr = this.state.jsonNotes;
-        noteArr.push({ clef: this.props.clef, keys: ['c/4'], duration: 'q' });
-        this.setState({ jsonNotes: noteArr });
-        setTimeout(2000);
-        this.renderVexFlow(noteArr);
-      } else if (event.code === 'KeyD') {
-        // eslint-disable-next-line react/no-access-state-in-setstate
-        const noteArr = this.state.jsonNotes;
-        noteArr.pop();
-        this.setState({ jsonNotes: noteArr });
-        setTimeout(2000);
-        this.renderVexFlow(noteArr);
-      }
-    });
+    // document.addEventListener('keypress', (event) => {
+    //   if (event.code === 'KeyM') {
+    //     // eslint-disable-next-line react/no-access-state-in-setstate
+    //     const noteArr = this.state.jsonNotes;
+    //     noteArr.push({ clef: this.props.clef, keys: ['c/4'], duration: 'q' });
+    //     this.setState({ jsonNotes: noteArr });
+    //     setTimeout(2000);
+    //     this.renderVexFlow(noteArr);
+    //   } else if (event.code === 'KeyD') {
+    //     // eslint-disable-next-line react/no-access-state-in-setstate
+    //     const noteArr = this.state.jsonNotes;
+    //     noteArr.pop();
+    //     this.setState({ jsonNotes: noteArr });
+    //     setTimeout(2000);
+    //     this.renderVexFlow(noteArr);
+    //   }
+    // });
   }
 
   renderVexFlow = (json) => {
@@ -68,7 +68,7 @@ class VexNotes extends Component {
     if (this.checkTicks(measures)) {
       // renders notes and staves
       this.renderNotes(measures, ties);
-      // adds event listeners to notes
+      // adds evenƒt listeners to notes
       this.addListeners(measures);
     } else {
       this.setState({ error: true });
@@ -77,6 +77,7 @@ class VexNotes extends Component {
 
   setNoteColors = (measures, ties) => {
     if (this.props.mode === 'rhythm' && this.props.correctnessArray !== undefined && this.props.correctnessArray !== null) {
+      console.log(this.props.correctnessArray, 'in vex array');
       let noteCount = 0;
       // loop through each measure
       let tieColor = null;
@@ -109,7 +110,6 @@ class VexNotes extends Component {
                 }
               }
             } else if (this.props.correctnessArray.length === noteCount) {
-              console.log('set style');
               note.setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
               if (hasTie) {
                 tieColor = 'yellow';
@@ -147,6 +147,18 @@ class VexNotes extends Component {
     } else {
       return false;
     }
+  }
+
+  setFill = (stave, measureNum) => {
+    const newstave = stave;
+    if (this.props.highlightMeasure === measureNum) {
+      newstave.options.fill_style = '#8b3c99';
+      Vex.Flow.STAVE_LINE_THICKNESS = 1.5;
+    } else {
+      newstave.options.fill_style = 'black';
+      Vex.Flow.STAVE_LINE_THICKNESS = 1;
+    }
+    return newstave;
   }
 
  getJsonNotes = (json) => {
@@ -323,8 +335,9 @@ class VexNotes extends Component {
 
     const context = renderer.getContext();
 
-    // Create a stave at position 10, 40 of width 400 on the canvas.
-    const stave = new VF.Stave(10, 100, firstMeasureWidth);
+    // Create a stave at position 10, 40 of width firstMeasureWidth on the canvas.
+    let stave = new VF.Stave(10, 100, firstMeasureWidth);
+    stave = this.setFill(stave, 0);
 
     // // Add a clef and time signature.
     stave.addClef(this.props.clef).addTimeSignature(this.props.timeSignature).addKeySignature(this.props.keySignature);
@@ -342,7 +355,7 @@ class VexNotes extends Component {
         newLine = true;
         xLocation = 10;
         anotherStaff = true;
-        yLocation += 80;
+        yLocation += 140;
       }
       measureNotes = measures[i];
       const measureWidth = this.getMeasureWidth(measureNotes);
@@ -354,7 +367,7 @@ class VexNotes extends Component {
 
         Vex.Flow.Accidental.applyAccidentals([voice], this.props.keySignature);
         // eslint-disable-next-line no-unused-vars
-        const formatter = new VF.Formatter({ softmaxFactor: 2 }).joinVoices([voice]).format([voice], measureWidth - 80);
+        const formatter = new VF.Formatter({ softmaxFactor: 5 }).joinVoices([voice]).format([voice], measureWidth - 80);
 
         // Render voice
         // voice.draw(context, stave);
@@ -370,10 +383,12 @@ class VexNotes extends Component {
         let staveMeasure;
         if (anotherStaff) {
           staveMeasure = new VF.Stave(xLocation, yLocation, measureWidth);
+          staveMeasure = this.setFill(staveMeasure, i);
           staveMeasure.addClef(this.props.clef).addKeySignature(this.props.keySignature);
           anotherStaff = false;
         } else {
           staveMeasure = new VF.Stave(xLocation, yLocation, measureWidth);
+          staveMeasure = this.setFill(staveMeasure, i);
         }
 
         // if (newLine) {
@@ -388,7 +403,7 @@ class VexNotes extends Component {
         Vex.Flow.Accidental.applyAccidentals([voice], this.props.keySignature);
         staveMeasure.setContext(context).draw();
         // eslint-disable-next-line no-unused-vars
-        const formatter = new VF.Formatter().joinVoices([voice]).format([voice], measureWidth);
+        const formatter = new VF.Formatter({ softmaxFactor: 5 }).joinVoices([voice]).format([voice], measureWidth);
 
         // Render voice
         voice.draw(context, staveMeasure);

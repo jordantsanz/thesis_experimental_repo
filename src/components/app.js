@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { getUserInfo } from '../actions';
 // import RhythmWrapper from './RhythmWrapper';
 import Lesson from './Lesson';
+// import Start from './Start';
 
 const App = (props) => {
   const token = localStorage.getItem('token');
@@ -15,7 +16,8 @@ const App = (props) => {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={Lesson} />
+        <Route path="" component={Lesson} />
+        <Route path="/lessons/random" component={Lesson} />
       </Switch>
     </Router>
   );
