@@ -706,7 +706,7 @@ class Rhythm extends Component {
       return (<div />);
     } else if (this.state.countDownNumber === 0) {
       return (
-        <div className="countdown-text">GO!!</div>
+        <div className="countdown-text">GO!</div>
       );
     } else {
       return (<div className="countdown-text">{this.state.countDownNumber}</div>);

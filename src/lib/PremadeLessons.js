@@ -673,7 +673,7 @@ const iPage1 = {
 
   Remember to press the spacebar to the beat! `,
   hasImage: true,
-  image: '/images/quarter.png',
+  image: '../images/quarter.png',
 };
 
 const iPage2 = {
@@ -694,7 +694,7 @@ const iPage2 = {
 
   Remember to press the spacebar to the beat! `,
   hasImage: true,
-  image: '/images/half.png',
+  image: '../images/half.png',
 };
 
 const iPage3 = {
@@ -715,7 +715,7 @@ const iPage3 = {
 
   Remember to press the spacebar to the beat! `,
   hasImage: true,
-  image: '/images/whole.png',
+  image: '../images/whole.png',
 };
 
 const iPage4 = {
@@ -736,7 +736,7 @@ const iPage4 = {
 
   Remember to press the spacebar to the beat! `,
   hasImage: true,
-  image: '/images/eighth.png',
+  image: '../images/eighth.png',
 };
 
 const iPage5 = {
@@ -796,7 +796,7 @@ const iPage7 = {
   Remember to press the spacebar for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: true,
-  image: '/images/f-key.png',
+  image: '../images/f-key.png',
 };
 
 const iPage8 = {
@@ -816,7 +816,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   Remember to press the spacebar for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: true,
-  image: '/images/f-key-half.png',
+  image: '../images/f-key-half.png',
 };
 
 const iPage9 = {
@@ -923,7 +923,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   Remember to press the spacebar for the bottom space notes, your "F" key for 
   the second space notes, and the "J" key for the third space notes. `,
   hasImage: true,
-  image: '/images/j-key.png',
+  image: '../images/j-key.png',
 };
 
 const iPage14 = {
@@ -946,7 +946,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   Remember to press the spacebar for the bottom space notes, your "F" key for 
   the second space notes, and the "J" key for the third space notes. `,
   hasImage: true,
-  image: '/images/j-key-two.png',
+  image: '../images/j-key-two.png',
 };
 
 const iPage15 = {

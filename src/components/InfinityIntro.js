@@ -109,14 +109,14 @@ class InfinityIntro extends Component {
                   Each lesson is taught in 4/4 time. This is called the time signature. 4/4 time means that each measure will have four beats in it, and that a
                   quarter note will correspond to one beat (you&apos;ll learn what a quarter note is later.)
                 </li>
-                <img alt="time-signature-4-4" className="4-4" src="/images/4-4.png" />
+                <img alt="time-signature-4-4" className="4-4" src="../images/4-4.png" />
               </div>
               <br />
               <div className="rt-intro-pic-div">
                 <li className="rt-intro-text">
                   Each lesson is taught on the percussion clef, as per drum notation.
                 </li>
-                <img alt="percussion-clef" className="4-4" src="/images/percussion.png" />
+                <img alt="percussion-clef" className="4-4" src="../images/percussion.png" />
               </div>
             </ul>
             <br />
