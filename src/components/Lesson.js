@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+/* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable no-param-reassign */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable no-plusplus */
@@ -21,12 +23,13 @@ const Page = (props) => {
   const stopped = (url, blob) => {
     console.log(blob);
     console.log('in stopped');
+    // eslint-disable-next-line no-unused-vars
     const myFile = new File(
       [blob],
       `${props.id}-${props.lesson_id}-${props.attempt}.mp4`,
       { type: 'video/mp4' },
     );
-    props.sendVideo(myFile, props.id, props.lesson_id, props.attempt);
+    props.sendTheVideo(url, props.id, props.lesson_id, props.attempt);
   };
   const {
     startRecording,
@@ -43,29 +46,31 @@ const Page = (props) => {
   if (props.page.page_type === 'activity' || props.page.page_type === 'random_activity') {
     if (props.page.info.activity_type === 'Rhythm-Sensing') {
       return (
-        <Rhythm
-          percentage={props.percentage}
-          xp={props.xp}
-          stopRecording={stopRecording}
-          status={status}
-          startRecording={startRecording}
-          instructions={props.page.info.r.instructions}
-          activityID={props.page._id}
-          notes={props.page.info.r.notes}
-          timeSignature={props.page.info.r.time_signature}
-          keys={props.page.info.r.keys}
-          bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
-          goToNext={props.goToNext}
-          lives={props.lives}
-          registerCompletion={props.registerCompletion}
-          infinity={props.infinity}
-          level={props.level}
-          type={type}
-          changePage={props.changePage}
-          pageCount={props.pageCount}
-          currentPage={props.currentPage}
-          makeNewAttempt={props.makeNewAttempt}
-        />
+        <div>
+          <Rhythm
+            percentage={props.percentage}
+            xp={props.xp}
+            stopRecording={stopRecording}
+            status={status}
+            startRecording={startRecording}
+            instructions={props.page.info.r.instructions}
+            activityID={props.page._id}
+            notes={props.page.info.r.notes}
+            timeSignature={props.page.info.r.time_signature}
+            keys={props.page.info.r.keys}
+            bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
+            goToNext={props.goToNext}
+            lives={props.lives}
+            registerCompletion={props.registerCompletion}
+            infinity={props.infinity}
+            level={props.level}
+            type={type}
+            changePage={props.changePage}
+            pageCount={props.pageCount}
+            currentPage={props.currentPage}
+            makeNewAttempt={props.makeNewAttempt}
+          />
+        </div>
       );
     }
   } else {
@@ -188,7 +193,7 @@ class Lesson extends Component {
           changePage={this.changePage}
           pageCount={lesson.pages.length}
           currentPage={this.state.currentPage + i - 1}
-          sendVideo={this.props.sendVideo}
+          sendTheVideo={this.sendTheVideo}
           id={this.props.correctness.id}
           halfSpeed={this.state.halfSpeed}
           attempt={this.state.attempt}
@@ -274,6 +279,10 @@ class Lesson extends Component {
     }
   }
 
+  sendTheVideo = (url, id, lesson_id, attempt) => {
+    this.props.sendVideo(url, id, lesson_id, attempt);
+  }
+
   determineResultWord = (percent) => {
     if (percent >= resultWords.VERY_GOOD_UPPER_BOUND) {
       return 'Great!';
@@ -339,9 +348,9 @@ class Lesson extends Component {
             <div className="rt-center">
               <div className="rt-lesson-subtitle">Activity</div>
             </div>
-            {/* {pages[this.state.currentPage - 1]} */}
-            {pages[15]}
+            {pages[this.state.currentPage - 1]}
             {this.renderNextButton()}
+
           </div>
         );
         ///  NEED TO CHANGE FOR REAL: should be facialAffect !== -1 for face condition

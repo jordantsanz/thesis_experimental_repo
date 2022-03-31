@@ -226,7 +226,7 @@ class Rhythm extends Component {
             divId={`rhythm-stave-${this.props.currentPage}`}
             mode="rhythm"
             color={color}
-            correctnessArray={this.state.correctnessArray}
+            correctnessArray={this.state.userAttempting ? this.state.correctnessArray : this.state.listeningArray}
             rerender={this.state.rerender}
             rerenderComplete={() => { this.setState({ rerender: false }); }}
             setMeasureCount={this.setMeasureCount}
@@ -412,18 +412,30 @@ class Rhythm extends Component {
         this.setState({ correctnessArray, rerender: true });
       }
 
-      if (final && !success) {
+      if (final && !success && this.state.userAttempting) {
+        console.log('register completion 1');
         this.props.registerCompletion(errorArray, correctnessArray);
-        this.setState({ sentCompleted: true });
+        this.setState({
+          sentCompleted: true, correctnessArray, errorArray, success, foundIndexes, accuracyArray,
+        });
         this.props.stopRecording();
-      } else if (final && success && !this.state.sentCompleted) {
-        this.setState({ sentCompleted: true });
+      } else if (final && success && !this.state.sentCompleted && this.state.userAttempting) {
+        console.log('register completion 2');
         this.props.registerCompletion(errorArray, correctnessArray);
         this.props.stopRecording();
+        this.setState({
+          sentCompleted: true, correctnessArray, errorArray, success, foundIndexes, accuracyArray,
+        });
+      } else if (!this.state.userAttempting) {
+        this.setState({
+          success: false, errorArray, correctnessArray, listeningArray: [], foundIndexes, accuracyArray,
+        });
+      } else {
+        this.setState({
+          success, errorArray, correctnessArray, foundIndexes, rerender: true, accuracyArray,
+        });
       }
-      this.setState({
-        success, errorArray, correctnessArray, rerender: true, foundIndexes, accuracyArray,
-      });
+
       // }
     } else if (final && !playAnswer) {
       this.props.registerCompletion(this.state.errorArray, this.state.correctnessArray);
@@ -583,15 +595,16 @@ class Rhythm extends Component {
       }
       fakeCArray.push(1);
       console.log(fakeCArray);
-      this.setState((prevState) => {
-        return (
-          {
-            listeningArray: fakeCArray,
-          }
-        );
-      });
       setTimeout(() => {
         this.playAnswerClicks(i + 1);
+        this.setState((prevState) => {
+          return (
+            {
+              listeningArray: fakeCArray,
+              rerender: true,
+            }
+          );
+        });
       }, interval);
     }
   }
@@ -715,6 +728,7 @@ class Rhythm extends Component {
 
   renderButtonsOrSpaceBar = () => {
     if (this.state.sentCompleted) {
+      console.log('sent completed');
       return (
         <div />
       );
@@ -740,6 +754,7 @@ class Rhythm extends Component {
         </div>
       );
     } else {
+      console.log('success: ', this.state.success);
       return (
         <div />
       );

@@ -2,15 +2,17 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable eqeqeq */
 import axios from 'axios';
+import { renderToStaticMarkup } from 'react-dom/server';
 // const ROOT_URL = 'https://warblermusic.herokuapp.com/api';
 // const ROOT_URL = 'https://warbler-ic-server.herokuapp.com/';
 
 // import { generateRhythmActivity } from '../components/Random';
 import { calculateAccuracyPercent, calculateAffectPercent, calculateErrorPercent } from './CalculatePercentages';
 import premadeLessons from '../lib/PremadeLessons';
+import { getVideoElementVersion, analyzeVid } from './AnalyzeVideo';
 // url for face detection
 // LOCAL:
-const ROOT_URL = 'http://localhost:5000';
+const ROOT_URL = 'http://localhost:9090/api';
 // PROD:
 // const ROOT_URL = 'https://jsanz-thesis-backend.uk.r.appspot.com';
 
@@ -85,6 +87,14 @@ export function makeContentPage(lessonid, fields) {
 
 export function sendVideo(video, id, lesson_id, attempt) {
   console.log('actions send video', id);
+  const vid = getVideoElementVersion(video);
+  console.log('vid', vid);
+  console.log('video', video);
+  const vidElement = document.createElement('video');
+  vidElement.src = video;
+  console.log('render static', renderToStaticMarkup(vid));
+  console.log('vidElement', vidElement);
+  analyzeVid('the-real-vid');
   return ((dispatch) => {
     const formData = new FormData();
     formData.append('video', video);

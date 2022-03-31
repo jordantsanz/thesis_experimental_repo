@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { getUserInfo } from '../actions';
 // import RhythmWrapper from './RhythmWrapper';
 import Lesson from './Lesson';
+import FaceApiTest from './FaceApiTest';
 // import Start from './Start';
 
 const App = (props) => {
@@ -16,7 +17,8 @@ const App = (props) => {
   return (
     <Router>
       <Switch>
-        <Route path="" component={Lesson} />
+        <Route path="/test" component={FaceApiTest} />
+        <Route path="/" component={Lesson} />
         <Route path="/lessons/random" component={Lesson} />
       </Switch>
     </Router>

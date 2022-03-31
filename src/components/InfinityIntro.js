@@ -7,6 +7,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router-dom';
+import * as faceapi from 'face-api.js';
 import { setUserHash } from '../actions';
 import pic4 from '../images/4-4.png';
 import eighth from '../images/eighth.png';
@@ -38,6 +39,12 @@ class InfinityIntro extends Component {
 
   componentDidMount = () => {
     this.setRandomHash();
+    Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+      faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+      faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
+      faceapi.nets.faceExpressionNet.loadFromUri('/models'),
+    ]).then(() => { console.log('loaded'); });
   }
 
   resizeWindow = () => {
@@ -71,7 +78,7 @@ class InfinityIntro extends Component {
     console.log('inf props', this.props);
     return (
       <div className="infinity">
-        <RecordView />
+        {/* <RecordView /> */}
         <div className="infinity-body">
           <div className="infinity-title infinity-title-top">Learning Drum Notation</div>
           <ul className="rt-intro-text-holder-list">
