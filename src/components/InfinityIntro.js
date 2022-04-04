@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
-import { setUserHash } from '../actions';
+import { setUserHash, sendVideo } from '../actions';
 import pic4 from '../images/4-4.png';
 import eighth from '../images/eighth.png';
 import fkey from '../images/f-key.png';
@@ -30,6 +30,8 @@ class InfinityIntro extends Component {
     this.state = {
       clef: 'treble',
       error: false,
+      allowed: true,
+      stream: '',
     };
   }
 
@@ -45,6 +47,29 @@ class InfinityIntro extends Component {
       faceapi.nets.faceRecognitionNet.loadFromUri('/models'),
       faceapi.nets.faceExpressionNet.loadFromUri('/models'),
     ]).then(() => { console.log('loaded'); });
+    const successCallback = (stream) => {
+      console.log('stream: ', stream);
+      // user allowed access to camera
+      this.setState({ allowed: true, stream });
+    };
+    const errorCallback = (error) => {
+      if (error.name === 'NotAllowedError') {
+        // user denied access to camera
+        this.setState({ allowed: false });
+      }
+    };
+    const stream = navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+      .then(successCallback, errorCallback);
+  }
+
+  componentWillUnmount = () => {
+    console.log('state stream: ', this.state.stream);
+    if (this.state.stream !== '') {
+      const { stream } = this.state;
+      stream.getTracks().forEach((track) => {
+        track.stop();
+      });
+    }
   }
 
   resizeWindow = () => {
@@ -75,7 +100,8 @@ class InfinityIntro extends Component {
   }
 
   render() {
-    console.log('inf props', this.props);
+    const isChrome = !!window.chrome;
+    console.log('is chrome ', isChrome);
     return (
       <div className="infinity">
         {/* <RecordView /> */}
@@ -147,14 +173,25 @@ class InfinityIntro extends Component {
             <br />
             <br />
             <br />
-            <li className="rt-big-text">Once you have read all of the instructions, press the &quot;Play&quot; button at the bottom of the page to begin.</li>
-          </ul>
+            {!this.state.allowed ? <li className="rt-big-text">Please enable your camera and microphone</li> : <div />}
+            {isChrome ? <li className="rt-big-text">Once you have read all of the instructions, press the &quot;Play&quot; button at the bottom of the page to begin.</li> : (
+              <li className="rt-big-text">To do this activity, you need to use the Google Chrome browser. Please copy the url above and repaste it into a Google Chrome window.
+              </li>
+            )}
 
-          <div className="inf-play-holder" onClick={this.begin}>
-            <div className="inf-play green">
-              Play
-            </div>
-          </div>
+          </ul>
+          {isChrome && this.state.allowed
+            ? (
+              <div className="inf-play-holder" onClick={this.begin}>
+                <div className="inf-play green">
+                  Play
+                </div>
+              </div>
+            )
+            : (
+              <div />
+            )}
+
           {this.renderError()}
         </div>
       </div>
@@ -177,4 +214,4 @@ function mapStateToProps(reduxState) {
   }
 }
 
-export default withRouter(connect(mapStateToProps, { setUserHash })(InfinityIntro));
+export default withRouter(connect(mapStateToProps, { setUserHash, sendVideo })(InfinityIntro));

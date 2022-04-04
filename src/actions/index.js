@@ -2,19 +2,18 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable eqeqeq */
 import axios from 'axios';
-import { renderToStaticMarkup } from 'react-dom/server';
+// import { generateRhythmActivity } from '../components/Random';
+import { calculateAccuracyPercent, calculateErrorPercent, calculateAffectPercent } from './CalculatePercentages';
+import premadeLessons from '../lib/PremadeLessons';
+// import { renderToStaticMarkup } from 'react-dom/server';
 // const ROOT_URL = 'https://warblermusic.herokuapp.com/api';
 // const ROOT_URL = 'https://warbler-ic-server.herokuapp.com/';
-
-// import { generateRhythmActivity } from '../components/Random';
-import { calculateAccuracyPercent, calculateAffectPercent, calculateErrorPercent } from './CalculatePercentages';
-import premadeLessons from '../lib/PremadeLessons';
-import { getVideoElementVersion, analyzeVid } from './AnalyzeVideo';
+const ROOT_URL = '';
 // url for face detection
 // LOCAL:
-const ROOT_URL = 'http://localhost:9090/api';
+// const VIDEO_URL = 'http://127.0.0.1:8000';
 // PROD:
-// const ROOT_URL = 'https://jsanz-thesis-backend.uk.r.appspot.com';
+const VIDEO_URL = 'https://thesis-backend-jsanz.onrender.com';
 
 // url for database
 // LOCAL:
@@ -87,19 +86,20 @@ export function makeContentPage(lessonid, fields) {
 
 export function sendVideo(video, id, lesson_id, attempt) {
   console.log('actions send video', id);
-  const vid = getVideoElementVersion(video);
-  console.log('vid', vid);
-  console.log('video', video);
-  const vidElement = document.createElement('video');
-  vidElement.src = video;
-  console.log('render static', renderToStaticMarkup(vid));
-  console.log('vidElement', vidElement);
-  analyzeVid('the-real-vid');
+  // const vid = getVideoElementVersion(video);
+  // console.log('vid', vid);
+  // console.log('video', video);
+  // const vidElement = document.createElement('video');
+  // vidElement.src = video;
+  // console.log('render static', renderToStaticMarkup(vid));
+  // console.log('vidElement', vidElement);
+  // analyzeVid('the-real-vid');
   return ((dispatch) => {
     const formData = new FormData();
     formData.append('video', video);
+    console.log(video, 'video');
     console.log('sending video');
-    axios.post(`${ROOT_URL}/video`, formData, {
+    axios.post(`${VIDEO_URL}/video`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -111,6 +111,9 @@ export function sendVideo(video, id, lesson_id, attempt) {
       });
       dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
     });
+    // axios.post(`${VIDEO_URL}/test`).then((res) => {
+    //   console.log('res: ', res);
+    // });
   });
 }
 
@@ -122,8 +125,11 @@ export function setUserHash(hash) {
 }
 
 export function createNewAttempt(id, lesson_id, attempt) {
-  axios.post(`${ROOT_URL_DATABASE}/newattempt`, {
-    id, lesson_id, attempt, isControl: true,
+  return ((dispatch) => {
+    console.log('create new attempt');
+    axios.post(`${ROOT_URL_DATABASE}/newattempt`, {
+      id, lesson_id, attempt, isControl: true,
+    });
   });
 }
 
@@ -146,12 +152,13 @@ export function getErrorPercent(errorArray, id, lesson_id, attempt) {
   });
 }
 
-export function getAccuracyPercent(accuracyArray, id, lesson_id, attempt) {
+export function getAccuracyPercentAndErrorPercent(accuracyArray, errorArray, id, lesson_id, attempt) {
   console.log('get accuracy in actions', id);
   const percent = calculateAccuracyPercent(accuracyArray);
+  const errorPercent = calculateErrorPercent(errorArray);
 
-  axios.put(`${ROOT_URL_DATABASE}/accuracy`, {
-    percent, id, lesson_id, attempt,
+  axios.put(`${ROOT_URL_DATABASE}/percents`, {
+    percent, errorPercent, id, lesson_id, attempt,
   });
   return ((dispatch) => {
     console.log('dispatch accuracy');

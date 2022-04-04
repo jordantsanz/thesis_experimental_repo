@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 /* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable no-param-reassign */
@@ -10,26 +11,27 @@ import { withRouter } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
 import {
   getLesson, getErrorPercent, createNewAttempt,
-  resetAllCorrectness, getAccuracyPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
+  resetAllCorrectness, getAccuracyPercentAndErrorPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
 import NextButton from './Exercises/NextButton';
 import { resultPercentRanges, resultWords } from '../lib/constants';
-import Rhythm from './Rhythm';
+// import Rhythm from './Rhythm';
+import RhythmNew from './RhythmNew';
 import InfinityIntro from './InfinityIntro';
 
 const Page = (props) => {
-  console.log('thepageprops', props);
+  // console.log('thepageprops', props);
   const stopped = (url, blob) => {
-    console.log(blob);
-    console.log('in stopped');
+    // console.log(blob);
+    // console.log('in stopped');
     // eslint-disable-next-line no-unused-vars
     const myFile = new File(
       [blob],
       `${props.id}-${props.lesson_id}-${props.attempt}.mp4`,
       { type: 'video/mp4' },
     );
-    props.sendTheVideo(url, props.id, props.lesson_id, props.attempt);
+    props.sendTheVideo(myFile, props.id, props.lesson_id, props.attempt);
   };
   const {
     startRecording,
@@ -37,7 +39,7 @@ const Page = (props) => {
     mediaBlobUrl,
     status,
   } = useReactMediaRecorder({ video: true, onStop: stopped, blobPropertyBag: { type: 'video/mp4' } });
-  console.log({ mediaBlobUrl });
+  // console.log({ mediaBlobUrl });
 
   let { type } = props;
   if (type === undefined) {
@@ -47,7 +49,7 @@ const Page = (props) => {
     if (props.page.info.activity_type === 'Rhythm-Sensing') {
       return (
         <div>
-          <Rhythm
+          {/* <Rhythm
             percentage={props.percentage}
             xp={props.xp}
             stopRecording={stopRecording}
@@ -69,6 +71,21 @@ const Page = (props) => {
             pageCount={props.pageCount}
             currentPage={props.currentPage}
             makeNewAttempt={props.makeNewAttempt}
+          /> */}
+          <RhythmNew
+            notes={props.page.info.r.notes}
+            timeSignature={props.page.info.r.time_signature}
+            currentPage={props.currentPage}
+            keys={props.page.info.r.keys}
+            pageCount={props.pageCount}
+            makeNewAttempt={props.makeNewAttempt}
+            changePage={props.changePgae}
+            goToNext={props.goToNext}
+            registerCompletion={props.registerCompletion}
+            stopRecording={stopRecording}
+            startRecording={startRecording}
+            // bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
+            bpm={props.page.info.r.bpm}
           />
         </div>
       );
@@ -121,22 +138,22 @@ class Lesson extends Component {
     const { id } = this.props.match.params;
     if (!this.props.lesson && this.props.type !== 'preview') {
       if (id === 'random') {
-        console.log('getting random lesson');
+        // console.log('getting random lesson');
       } else {
         this.props.getLesson(id, this.props.history, false);
       }
     }
 
     if (id === 'random') {
-      console.log('setting lives to 3');
+      // console.log('setting lives to 3');
       this.setState({ lives: 3, random: true });
     }
   }
 
   registerCompletion = (errorArray, accuracyArray) => {
-    console.log('register completion called', errorArray, accuracyArray);
-    this.props.getErrorPercent(errorArray, this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
-    this.props.getAccuracyPercent(accuracyArray, this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
+    // console.log('register completion called', errorArray, accuracyArray);
+    // this.props.getErrorPercent(errorArray, this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
+    this.props.getAccuracyPercentAndErrorPercent(accuracyArray, errorArray, this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
     this.setState({ pagesCompleted: true });
   }
 
@@ -146,11 +163,11 @@ class Lesson extends Component {
   }
 
   goToNext = (attempts, type) => {
-    console.log('going to next!');
+    // console.log('going to next!');
     if (this.props.type === 'preview') {
       this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
     } else {
-      console.log('going to next!!', type, attempts);
+      // console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
         if (!this.state.random) {
           this.props.registerLessonCompletion(this.props.lesson._id, this.props.user.id);
@@ -158,7 +175,7 @@ class Lesson extends Component {
         this.props.getUserInfo();
       }
       this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
-      console.log('finished going to next');
+      // console.log('finished going to next');
     }
   }
 
@@ -321,7 +338,7 @@ class Lesson extends Component {
       if (this.state.pages === null) {
         [pages, instructionPages] = this.makePages();
       }
-      console.log('currentPage', this.state.currentPage, 'pages', pages);
+      // console.log('currentPage', this.state.currentPage, 'pages', pages);
       if (this.state.currentPage <= pages.length && !this.state.determiningCompletion) {
         return (
           <div>
@@ -397,7 +414,7 @@ class Lesson extends Component {
 
 function mapStateToProps(reduxState) {
   if (window.location.pathname.split('/')[1] === 'createlesson') {
-    console.log('in lesson making');
+    // console.log('in lesson making');
     return {
       lesson: reduxState.lessonMaking,
     };
@@ -421,8 +438,7 @@ export default withRouter(connect(mapStateToProps, {
   getUserInfo,
   updateLevel,
   assignCoins,
-  getErrorPercent,
-  getAccuracyPercent,
+  getAccuracyPercentAndErrorPercent,
   resetAllCorrectness,
   createNewAttempt,
 })(Lesson));

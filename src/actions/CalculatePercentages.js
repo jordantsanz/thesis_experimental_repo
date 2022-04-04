@@ -8,7 +8,7 @@ export const calculateAccuracyPercent = (accuracyArray) => {
 
   let numberCorrect = 0;
   for (let i = 0; i < totalNotes; i += 1) {
-    if (accuracyArray[i] === 1) {
+    if (accuracyArray[i] === 'green') {
       numberCorrect += 1;
     }
   }

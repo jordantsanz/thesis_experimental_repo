@@ -33,6 +33,7 @@ class Rhythm extends Component {
       success: null,
       correctnessArray: [],
       listeningArray: [],
+      lightBlueArray: [],
       keyPresses: [],
       accuracyArray: null,
       rerender: false,
@@ -42,14 +43,18 @@ class Rhythm extends Component {
       timeDelay: 0,
       attempts: 0,
       sentCompleted: false,
+      checks1: [],
+      checks2: [],
     };
   }
 
   componentDidMount = () => {
     this.initializeRhythmExercise(this.props.notes, this.props.keys);
+    console.log('props: ', this.props);
   }
 
   initializeRhythmExercise = (noteArray, keyArray) => {
+    console.log('initialize');
     let notes = noteArray;
     if (notes === null || notes === undefined) {
       notes = this.props.notes;
@@ -61,6 +66,7 @@ class Rhythm extends Component {
 
     // prep for exercise start
     const bps = this.props.bpm / 60;
+    console.log(bps, 'bps');
     this.setState({ bps });
 
     const durationArray = this.createDurationArray(notes, bps, vexNotes);
@@ -84,29 +90,17 @@ class Rhythm extends Component {
     const correctTimes = [];
     const durationArray = [];
     const keyArray = [];
-    const beatValue = this.getTimeSignatureDenominator();
-    let timeDelay = 0;
+    const beatValue = 1;
+    const timeDelay = 0;
 
-    let firstNoteFound = false;
     for (let i = 0; i < notes.length; i += 1) {
       const duration = this.calculateDuration(notes[i], beatValue, bps);
       // eslint-disable-next-line no-unused-vars
       const keyPress = this.determineKeyPress(vexNotesArray[i]);
-      if (this.isRest(notes[i])) {
-        if (durationArray.length > 0) {
-          durationArray[durationArray.length - 1] += duration;
-        }
-        if (!firstNoteFound) {
-          timeDelay += duration;
-        }
-
-        // correctTimes[correctTimes.length - 1] = cumulativeTime; // replace last entry with cumulative time
-      } else if (durationArray.length < notes.length && i < notes.length - 1) {
-        firstNoteFound = true;
+      if (durationArray.length < notes.length && i < notes.length - 1) {
         durationArray.push(duration);
         keyArray.push(keyPress);
       } else if (durationArray.length < notes.length && i === notes.length - 1) {
-        firstNoteFound = true;
         durationArray.push(duration);
         keyArray.push(keyPress);
       }
@@ -120,16 +114,18 @@ class Rhythm extends Component {
       if (!this.isRest(notes[j])) {
         found = true;
       } else {
-        cumulativeTime += this.calculateDuration(notes[j], beatValue, bps) * 1000;
+        cumulativeTime += Math.round(this.calculateDuration(notes[j], beatValue, bps) * 1000);
         j += 1;
       }
     }
 
     for (let i = 0; i < durationArray.length; i += 1) {
       correctTimes.push({ cumulativeTime, key: keyArray[i] });
-      cumulativeTime += durationArray[i] * 1000;
+      cumulativeTime += Math.round(durationArray[i] * 1000);
     }
     this.setState({ correctTimes, timeDelay });
+    console.log('final duration array: ', durationArray);
+    console.log('final correct times array: ', correctTimes);
     return durationArray;
   }
 
@@ -144,6 +140,7 @@ class Rhythm extends Component {
   calculateDuration = (noteCode, beatValue, bps) => {
     const noteDuration = this.getNoteDurationAsNumber(noteCode);
     const duration = noteDuration / (beatValue * bps);
+    console.log('duration: ', duration);
     return duration;
   }
 
@@ -214,7 +211,6 @@ class Rhythm extends Component {
         <div />
       );
     } else {
-      console.log(this.state.userAttempting, 'user attempting');
       // style={{ position: 'relative', right: this.state.rightAdjust }}
       return (
         <div>
@@ -231,6 +227,7 @@ class Rhythm extends Component {
             rerenderComplete={() => { this.setState({ rerender: false }); }}
             setMeasureCount={this.setMeasureCount}
             highlightMeasure={this.state.curMeasure}
+            lightBlueArray={this.state.lightBlueArray}
           />
         </div>
       );
@@ -284,9 +281,13 @@ class Rhythm extends Component {
     this.setState({ clickTimes: [], baselineTime: null, playing: true });
     const intervalTime = 1000 / this.state.bps;
     const bpm = this.getBeatsPerMeasure();
-    const introTime = intervalTime * bpm;
+    const introTime = Math.round(intervalTime * bpm);
+
+    console.log(introTime, 'introTime');
     const totalTime = this.getTotalTime() * 1000 + introTime;
+
     this.calculateBaselineTimes(intervalTime, bpm);
+
     let timeElapsed = 0;
     if (this.state.countDownNumber === null) {
       this.setState({ countDownNumber: bpm });
@@ -312,7 +313,6 @@ class Rhythm extends Component {
       this.state.metronomeAudio.play();
       if (countDownNumber === 0) {
         tickCount += 1;
-        console.log(Math.floor(tickCount / 4));
         this.setState({ curMeasure: Math.floor(tickCount / 4) });
       }
 
@@ -324,7 +324,7 @@ class Rhythm extends Component {
       timeElapsed += intervalTime;
       if (timeElapsed >= totalTime) {
         setTimeout(() => {
-          this.setState({ playing: false, userAttempting: false });
+          this.setState({ playing: false });
           this.checkAnswers(this.state.clickTimes, this.state.keyPresses, true, playAnswer);
           this.setState({ countDownNumber: null, playing: false });
           if (!playAnswer) {
@@ -377,9 +377,6 @@ class Rhythm extends Component {
         }
         const error = Math.abs(correctTime - userTime);
         errorArray.push(error);
-        console.log(keyPresses);
-        console.log(keyPresses[i], 'keypress');
-        console.log(this.state.correctTimes[i].key, 'correct key');
         if (error > 350 || (keyPresses[i] !== '' && keyPresses[i] !== undefined && keyPresses[i] !== this.state.correctTimes[i].key)) {
           success = false;
           correctnessArray.push(0);
@@ -413,18 +410,16 @@ class Rhythm extends Component {
       }
 
       if (final && !success && this.state.userAttempting) {
-        console.log('register completion 1');
         this.props.registerCompletion(errorArray, correctnessArray);
         this.setState({
-          sentCompleted: true, correctnessArray, errorArray, success, foundIndexes, accuracyArray,
+          sentCompleted: true, correctnessArray, errorArray, success, foundIndexes, accuracyArray, userAttempting: false,
         });
         this.props.stopRecording();
       } else if (final && success && !this.state.sentCompleted && this.state.userAttempting) {
-        console.log('register completion 2');
         this.props.registerCompletion(errorArray, correctnessArray);
         this.props.stopRecording();
         this.setState({
-          sentCompleted: true, correctnessArray, errorArray, success, foundIndexes, accuracyArray,
+          sentCompleted: true, correctnessArray, errorArray, success, foundIndexes, accuracyArray, userAttempting: false,
         });
       } else if (!this.state.userAttempting) {
         this.setState({
@@ -594,7 +589,6 @@ class Rhythm extends Component {
         fakeCArray.push(1);
       }
       fakeCArray.push(1);
-      console.log(fakeCArray);
       setTimeout(() => {
         this.playAnswerClicks(i + 1);
         this.setState((prevState) => {
@@ -619,17 +613,24 @@ class Rhythm extends Component {
   }
 
   playAnswer = () => {
+    this.buildCumulativeChecks();
     this.setState({ playing: true, listeningArray: [], rerender: true });
     this.playMetronome(true);
   }
 
+  buildCumulativeChecks = () => {
+    const checks1 = this.getCumulativeChecks();
+    const checks2 = this.getCumulativeChecks2();
+    this.setState({ checks1, checks2 });
+  }
+
   attemptExercise = () => {
+    this.buildCumulativeChecks();
     this.props.startRecording();
     this.setState({
       userAttempting: true, clickTimes: [], keyPresses: [], rerender: true, correctnessArray: [], curMeasure: 0,
     });
     this.playMetronome(false);
-    console.log(this.props, 'proppies');
     this.props.makeNewAttempt();
   }
 
@@ -650,19 +651,39 @@ class Rhythm extends Component {
   }
 
   checkIfInput = (index, time) => {
-    const { correctnessArray, clickTimes, keyPresses } = this.state;
+    const {
+      correctnessArray, clickTimes, keyPresses,
+    } = this.state;
     if (this.state.correctnessArray.length < index) {
       correctnessArray.push(0);
       keyPresses.push('f/4');
       clickTimes.push(0);
-      this.setState({ correctnessArray, rerender: true, clickTimes });
+      this.setState({
+        correctnessArray, rerender: true, clickTimes,
+      });
     }
   }
 
+  checkIfInput2 = (index, time) => {
+    const {
+      lightBlueArray,
+    } = this.state;
+    // if (this.state.correctnessArray.length === index) {
+    lightBlueArray.push(0);
+    // keyPresses.push('f/4');
+    // clickTimes.push(0);
+    this.setState({
+      rerender: true, lightBlueArray,
+    });
+    // }
+  }
+
   getCumulativeChecks = () => {
+    console.log('cumulative checks');
     const intervalTime = 1000 / this.state.bps;
     const bpm = this.getBeatsPerMeasure();
     const introTime = intervalTime * bpm;
+
     const cumulativeArray = [300 + introTime];
     const checkpointsArray = [];
     if (this.state.durationArray === null) {
@@ -670,6 +691,7 @@ class Rhythm extends Component {
     }
     for (let i = 1; i < this.state.durationArray.length; i += 1) {
       cumulativeArray.push(cumulativeArray[i - 1] + (this.state.durationArray[i - 1] * 1000));
+      // cumulativeArray.push(introTime + this.state.correctTimes[i].cumulativeTime);
     }
 
     for (let j = 0; j < cumulativeArray.length; j += 1) {
@@ -679,6 +701,37 @@ class Rhythm extends Component {
       };
       checkpointsArray.push(checkpoint);
     }
+    return checkpointsArray;
+  }
+
+  getCumulativeChecks2 = () => {
+    console.log('cum checks 2 called');
+
+    const intervalTime = 1000 / this.state.bps;
+    const bpm = this.getBeatsPerMeasure();
+    const introTime = Math.round(intervalTime * bpm);
+    console.log('intro time: ', introTime);
+
+    console.log(introTime);
+    // const cumulativeArray = [introTime];
+    const cumulativeArray = [introTime];
+    const checkpointsArray = [];
+    if (this.state.durationArray === null) {
+      return [];
+    }
+    for (let i = 1; i < this.state.durationArray.length; i += 1) {
+      // cumulativeArray.push(cumulativeArray[i - 1] + (this.state.durationArray[i - 1] * 1000));
+      cumulativeArray.push(introTime + this.state.correctTimes[i].cumulativeTime);
+    }
+
+    for (let j = 0; j < cumulativeArray.length; j += 1) {
+      const checkpoint = {
+        time: cumulativeArray[j],
+        callback: () => { this.checkIfInput2(j, cumulativeArray[j]); },
+      };
+      checkpointsArray.push(checkpoint);
+    }
+    console.log('checkpoint array: ', checkpointsArray);
     return checkpointsArray;
   }
 
@@ -728,7 +781,6 @@ class Rhythm extends Component {
 
   renderButtonsOrSpaceBar = () => {
     if (this.state.sentCompleted) {
-      console.log('sent completed');
       return (
         <div />
       );
@@ -754,7 +806,6 @@ class Rhythm extends Component {
         </div>
       );
     } else {
-      console.log('success: ', this.state.success);
       return (
         <div />
       );
@@ -768,28 +819,23 @@ class Rhythm extends Component {
   renderTimer = () => {
     if (this.state.userAttempting) {
       return (
-        <Timer direction="forward"
-          checkpoints={this.getCumulativeChecks()}
-        >
-          <Timer.Milliseconds />
-        </Timer>
+        <div className="timers">
+          <Timer direction="forward"
+            checkpoints={this.state.checks1}
+          >
+            <Timer.Milliseconds />
+          </Timer>
+          {/* <Timer direction="forward"
+            checkpoints={this.state.checks2}
+          >
+            <Timer.Milliseconds />
+          </Timer> */}
+        </div>
       );
     } else {
       return <div />;
     }
   }
-
-  // renderNextButton = () => {
-  //   if (this.state.success && this.state.correctnessArray.length === this.state.durationArray.length) {
-  //     return (
-  //       <NextButton goToNext={this.goToNext} />
-  //     );
-  //   } else {
-  //     return (
-  //       <div />
-  //     );
-  //   }
-  // }
 
   render() {
     let boxShadow = '';

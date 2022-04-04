@@ -5135,7 +5135,7 @@ color: #2BA0CC;
     text-align: center;
 }
 
-.rhythm-key-buttons{
+.rhythm-key-buttons, .rhythm-buttons{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -5147,6 +5147,7 @@ color: #2BA0CC;
 
 .rhythm-play-answer-button{
     width: 20vw;
+    min-width: 100px;
     max-width: 385px;
     height: 52px;
     left: 382px;
@@ -5171,6 +5172,7 @@ color: #2BA0CC;
 
 .rhythm-attempt-button{
     background: #1CB0F6;
+    min-width: 100px;
     border-radius: 29px;
     color: #FFFFFF;
     width: 12vw;

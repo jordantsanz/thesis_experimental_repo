@@ -20,9 +20,9 @@
  */
 
 const BPM_CONSTANTS = {
-  SLOW: 65,
-  MEDIUM: 80,
-  FAST: 90,
+  SLOW: 60,
+  MEDIUM: 75,
+  FAST: 100,
 };
 
 // lesson1: quarter notes only: DONE
@@ -1178,7 +1178,7 @@ const instructionPages = [iPage1, iPage2, iPage3, iPage4, iPage5, iPage6,
 const premadeLessons = [];
 for (let i = 0; i < lessons.length; i += 1) {
   const lesson = {
-    lessons_id: i,
+    lesson_id: i,
     instructionPage: instructionPages[i],
     page_type: 'random_activity',
     info: {

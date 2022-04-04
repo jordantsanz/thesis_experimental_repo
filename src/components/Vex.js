@@ -26,7 +26,9 @@ class VexNotes extends Component {
   }
 
   componentDidMount = () => {
+    // console.log('vex props: ', this.props);
     this.renderVexFlow();
+
     // this.rerenderNotes();
     // document.addEventListener('keypress', (event) => {
     //   if (event.code === 'KeyM') {
@@ -49,11 +51,13 @@ class VexNotes extends Component {
 
   renderVexFlow = (json) => {
     // remove everything all pre-existing taves
+    // console.log('redner vex flow');
     const node = document.getElementById(this.props.divId);
     node.querySelectorAll('*').forEach((n) => n.remove());
 
     // get notes as json
     const jsonNotes = this.getJsonNotes(json);
+    // console.log('after json notes');
 
     // process json notes
     const arr = this.processJsonNotes(jsonNotes);
@@ -61,11 +65,8 @@ class VexNotes extends Component {
     const ties = arr[1];
     measures = this.setNoteColors(measures, ties);
 
-    if (this.props.mode === 'sightreading') {
-      this.props.setMeasureInfo(measures, this.props.keySignature);
-    }
-
     if (this.checkTicks(measures)) {
+      //  console.log('measures: ', measures);
       // renders notes and staves
       this.renderNotes(measures, ties);
       // adds evenƒt listeners to notes
@@ -76,49 +77,33 @@ class VexNotes extends Component {
   }
 
   setNoteColors = (measures, ties) => {
-    if (this.props.mode === 'rhythm' && this.props.correctnessArray !== undefined && this.props.correctnessArray !== null) {
-      console.log(this.props.correctnessArray, 'in vex array');
+    if (this.props.colorsArray !== undefined && this.props.colorsArray !== null) {
+      // ('set note colors if');
       let noteCount = 0;
       // loop through each measure
-      let tieColor = null;
       for (let j = 0; j < measures.length; j += 1) {
         const measure = measures[j];
         // loop through each note in the measure
         for (let i = 0; i < measure.length; i += 1) {
           const note = measure[i];
-          const hasTie = this.hasTie(note, ties);
-          if (tieColor !== null) {
-            note.setStyle({ fillStyle: tieColor, strokeStyle: tieColor });
-            if (!hasTie) {
-              tieColor = null;
-            }
-          } else if (!this.isRest(note)) {
-            if (this.props.correctnessArray.length > noteCount) {
-              if (this.props.correctnessArray[noteCount] === 1) {
-                note.setStyle({ fillStyle: 'green', strokeStyle: 'green' });
-                if (hasTie) {
-                  tieColor = 'green';
-                } else {
-                  tieColor = null;
-                }
-              } else if (this.props.correctnessArray[noteCount] === 0) {
-                note.setStyle({ fillStyle: 'red', strokeStyle: 'red' });
-                if (hasTie) {
-                  tieColor = 'red';
-                } else {
-                  tieColor = null;
-                }
-              }
-            } else if (this.props.correctnessArray.length === noteCount) {
-              note.setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-              if (hasTie) {
-                tieColor = 'yellow';
-              } else {
-                tieColor = null;
-              }
-            }
-            noteCount += 1;
+          if (noteCount < this.props.colorsArray.length) {
+            note.setStyle({ fillStyle: this.props.colorsArray[noteCount], strokeStyle: this.props.colorsArray[noteCount] });
           }
+          noteCount += 1;
+
+          // if (!this.isRest(note)) {
+          //   // if (this.props.correctnessArray.length >= noteCount) {
+          //   if (this.props.correctnessArray[noteCount] === 1) {
+          //     note.setStyle({ fillStyle: 'green', strokeStyle: 'green' });
+          //   } else if (this.props.correctnessArray[noteCount] === 0) {
+          //     note.setStyle({ fillStyle: 'red', strokeStyle: 'red' });
+          //   }
+          //   // }
+          //   if (this.props.lightBlueArray.length === noteCount + 1) {
+          //     note.setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
+          //   }
+          //   noteCount += 1;
+          // }
         }
       }
     }
@@ -162,6 +147,7 @@ class VexNotes extends Component {
   }
 
  getJsonNotes = (json) => {
+   // console.log('get json notes');
    // only read from props if jsonNotes is empty
    let jsonNotes = this.state.jsonNotes;
    if (json !== null && json !== undefined) {
@@ -305,6 +291,7 @@ class VexNotes extends Component {
     }
 
     this.setState({ measures });
+    // console.log('measures and ties', measures, ties);
     return [measures, ties];
   }
 
@@ -432,11 +419,11 @@ class VexNotes extends Component {
     }
 
     if (width < this.state.maxWidth) {
-      this.props.setMeasureCount(measures.length);
+      // this.props.setMeasureCount(measures.length);
       return [width, this.state.rowHeight];
     } else {
       const rowCount = Math.ceil(this.state.maxWidth / width) + 1;
-      this.props.setMeasureCount(3);
+      // this.props.setMeasureCount(3);
       const dimensions = [this.state.maxWidth, rowCount * this.state.rowHeight];
       return dimensions;
     }
@@ -503,6 +490,7 @@ class VexNotes extends Component {
   }
 
   getFirstMeasureWidth = (measureNotes, keySignature) => {
+    // console.log('measure notes: ', measureNotes);
     const width = this.getMeasureWidth(measureNotes) + this.getKeySignatureWidth(keySignature);
     return width;
   }
@@ -762,6 +750,7 @@ class VexNotes extends Component {
   }
 
   render() {
+    // console.log('proppies: ', this.props);
     if (this.props.rerender) {
       this.renderVexFlow();
       this.props.rerenderComplete();
