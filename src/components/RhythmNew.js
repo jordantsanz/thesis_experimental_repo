@@ -348,6 +348,7 @@ class RhythmNew extends Component {
         console.log('user is attempting');
         this.props.registerCompletion(this.state.errorArray, this.state.colorsArray);
         this.props.stopRecording();
+        this.props.stopStopwatch();
         this.setState({ success: true, userAttempting: false });
       } else {
         this.setState({
@@ -436,7 +437,7 @@ class RhythmNew extends Component {
   }
 
   lightSpaceBar = () => {
-    const spacebar = document.getElementById('rhythm-spacebar');
+    const spacebar = document.getElementById('rhythm-b');
     spacebar.style.backgroundColor = '#FFC300';
     setTimeout(() => {
       spacebar.style.backgroundColor = '#FF9400';
@@ -488,16 +489,35 @@ class RhythmNew extends Component {
   }
 
   attemptExercise = () => {
-    // this.props.startRecording();
+    this.props.startRecording();
+    this.props.startStopwatch();
     this.setState({
       userAttempting: true, listening: false, clickTimes: [], keyPresses: [], rerender: true, correctnessArray: [], curMeasure: 0, colorsArray: [],
     });
-    this.props.makeNewAttempt();
+    this.props.makeNewAttempt(this.props.bpm);
     this.state.timer.stop();
     this.state.timer.start(100000);
     const beatsPerSecond = this.props.bpm / 60;
     const millisecondsPerBeat = this.calculateMetronomeHitInterval(beatsPerSecond);
     this.calculateBaselineTimes(millisecondsPerBeat);
+  }
+
+  stopListening = () => {
+    this.setState({
+      listening: false,
+      colorsArray: [],
+      errorArray: [],
+      accuracyArray: [],
+      countDownNumber: null,
+      rerender: true,
+      curNote: -1,
+      currNote: -1, // current blue
+      validHit: false, // was valid hit or not
+      lastCurNoteCheckpoint: 0, // previous checkpoint
+      checkpointsCounted: 0,
+    });
+    this.state.timer.stop();
+    this.state.timer.time = 0;
   }
 
   renderButtonsOrSpaceBar = () => {
@@ -507,17 +527,23 @@ class RhythmNew extends Component {
         <div />
       );
     } else if ((this.state.listening || this.state.userAttempting) && !(this.state.success)) {
-      console.log('listening: ', this.state.listening, 'attempting: ', this.state.userAttempting, 'success: ', !this.state.success);
       return (
-        <div className="rhythm-key-buttons">
-          <div className="rhythm-f" id="rhythm-f">
-            F
-          </div>
-          <div className="rhythm-spacebar" id="rhythm-spacebar">
-            B
-          </div>
-          <div className="rhythm-j" id="rhythm-j">
-            J
+        <div className="rhythm-flex-column">
+          {this.state.listening ? (
+            <button onClick={this.stopListening} type="button" id="cancel-button" className="rhythm-attempt-button">
+              Cancel
+            </button>
+          ) : null}
+          <div className="rhythm-key-buttons">
+            <div className="rhythm-f" id="rhythm-f">
+              F
+            </div>
+            <div className="rhythm-b" id="rhythm-b">
+              B
+            </div>
+            <div className="rhythm-j" id="rhythm-j">
+              J
+            </div>
           </div>
         </div>
       );

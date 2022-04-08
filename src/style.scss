@@ -4342,6 +4342,8 @@ color: white;
     top: 10%;
     right: 40%;
 }
+
+
 /***** Testing Vexflow ******/
 canvas{
     background: #EED;
@@ -5087,8 +5089,8 @@ color: #2BA0CC;
     justify-content: center;
 }
 
-.rhythm-spacebar{
-    width: 547px;
+.rhythm-b{
+    width: 140px;
     height: 79px;
     background: #FF9400;
     box-shadow: 4px 4px 10px #FFC300, -4px -4px 10px #FFC300;
@@ -5102,6 +5104,8 @@ color: #2BA0CC;
     color: white;
     font-size: 40px;
 }
+
+
 
 .rhythm-f{
     width: 140px;
@@ -5190,6 +5194,19 @@ color: #2BA0CC;
     justify-content: center;
     letter-spacing: 0.03em;
     border: none;
+}
+
+#cancel-button{
+    background: $red;
+    display: flex;
+    flex-direction: row;
+}
+
+.rhythm-flex-column{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 /************ CONTENT ******************/
@@ -9329,4 +9346,9 @@ letter-spacing: 0.03em;
 .rt-big-text{
     font-size: 38px;
     width: 85%;
+}
+
+.huge{
+    font-size: 40px;
+    font-weight: bold;
 }

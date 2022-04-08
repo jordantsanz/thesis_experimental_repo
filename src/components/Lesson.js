@@ -9,8 +9,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
+import Timer from 'react-compound-timer';
 import {
-  getLesson, getErrorPercent, createNewAttempt,
+  getLesson, uploadVideo, createNewAttempt,
   resetAllCorrectness, getAccuracyPercentAndErrorPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
@@ -32,13 +33,16 @@ const Page = (props) => {
       { type: 'video/mp4' },
     );
     props.sendTheVideo(myFile, props.id, props.lesson_id, props.attempt);
+    uploadVideo(myFile, props.id, props.lesson_id, props.attempt);
   };
   const {
     startRecording,
     stopRecording,
     mediaBlobUrl,
     status,
-  } = useReactMediaRecorder({ video: true, onStop: stopped, blobPropertyBag: { type: 'video/mp4' } });
+  } = useReactMediaRecorder({
+    video: true, audio: true, onStop: stopped, blobPropertyBag: { type: 'video/mp4' },
+  });
   // console.log({ mediaBlobUrl });
 
   let { type } = props;
@@ -86,6 +90,8 @@ const Page = (props) => {
             startRecording={startRecording}
             // bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
             bpm={props.page.info.r.bpm}
+            startStopwatch={props.startStopwatch}
+            stopStopwatch={props.stopStopwatch}
           />
         </div>
       );
@@ -131,6 +137,7 @@ class Lesson extends Component {
       determiningCompletion: false,
       attempt: 0,
       halfSpeed: false,
+      proceedToEnd: false,
     };
   }
 
@@ -157,13 +164,17 @@ class Lesson extends Component {
     this.setState({ pagesCompleted: true });
   }
 
-  makeNewAttempt = () => {
+  makeNewAttempt = (bpm) => {
     console.log('make new attempt called');
-    this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt);
+    this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt, bpm);
   }
 
   goToNext = (attempts, type) => {
     // console.log('going to next!');
+    if (this.props.timerFinished) {
+      this.setState({ proceedToEnd: true });
+      return;
+    }
     if (this.props.type === 'preview') {
       this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
     } else {
@@ -215,6 +226,8 @@ class Lesson extends Component {
           halfSpeed={this.state.halfSpeed}
           attempt={this.state.attempt}
           makeNewAttempt={this.makeNewAttempt}
+          startStopwatch={this.props.startStopwatch}
+          stopStopwatch={this.props.stopStopwatch}
         />,
       );
       instructionPagesList.push(lesson.pages[i].instructionPage);
@@ -314,14 +327,18 @@ class Lesson extends Component {
   }
 
   render() {
-    if (this.state.currentPage > 20) {
+    if (this.state.currentPage > 20 || this.state.proceedToEnd) {
       return (
-        <div>End: Need to give amazon code now, but not sure how this works yet.</div>
+        <div className="rt-intro-text">
+          This is the end of the activities. Your payment string is {this.props.correctness.string}.
+          Please make sure to submit the Qualtrics survey as the final piece of this experiment.
+          Thank you for your time!
+        </div>
       );
     }
     if (this.state.intro && this.state.random) {
       return (
-        <InfinityIntro begin={this.beginInfinityLesson} />
+        <InfinityIntro begin={this.beginInfinityLesson} startOverallTimer={this.props.startOverallTimer} />
       );
     } if (
       (this.props.lesson === undefined || this.props.lesson === null)

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/media-has-caption */
 /* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -8,7 +9,7 @@ import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { withRouter } from 'react-router-dom';
 import * as faceapi from 'face-api.js';
-import { setUserHash, sendVideo } from '../actions';
+import { sendVideo, setUserHash } from '../actions';
 import pic4 from '../images/4-4.png';
 import eighth from '../images/eighth.png';
 import fkey from '../images/f-key.png';
@@ -26,7 +27,6 @@ import RecordView from './RecordView';
 class InfinityIntro extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       clef: 'treble',
       error: false,
@@ -40,7 +40,6 @@ class InfinityIntro extends Component {
   }
 
   componentDidMount = () => {
-    this.setRandomHash();
     Promise.all([
       faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
       faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
@@ -58,7 +57,7 @@ class InfinityIntro extends Component {
         this.setState({ allowed: false });
       }
     };
-    const stream = navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+    const stream = navigator.mediaDevices.getUserMedia({ audio: false, video: true })
       .then(successCallback, errorCallback);
   }
 
@@ -79,12 +78,9 @@ class InfinityIntro extends Component {
   begin = () => {
     this.resizeWindow();
     window.scrollTo(0, 0);
+    this.props.setUserHash(this.props.correctness.id);
     this.props.begin('rhythm', this.state.clef);
-  }
-
-  setRandomHash = () => {
-    const hash = uuidv4();
-    this.props.setUserHash(hash);
+    this.props.startOverallTimer();
   }
 
   renderError = () => {
@@ -108,6 +104,8 @@ class InfinityIntro extends Component {
         <div className="infinity-body">
           <div className="infinity-title infinity-title-top">Learning Drum Notation</div>
           <ul className="rt-intro-text-holder-list">
+            <li className="rt-intro-text">MTurk ID: {this.props.correctness.id}</li>
+            <br />
             <li className="rt-intro-text">In this experiment, you will be taught drum music notation. You will learn note lengths and different drums.
             </li>
             <br />
@@ -143,11 +141,16 @@ class InfinityIntro extends Component {
               <li className="rt-intro-text">
                 Please enable microphone and camera access.
               </li>
+              <br />
+              <li className="rt-intro-text">
+                Please ensure your face is always in the frame of the camera.
+              </li>
+              <br />
               <li className="rt-intro-text">
                 Turn your sound on. Do not use bluetooth headphones. Try wired headphones or play sounds on your computer speakers.
               </li>
               <br />
-              <li className="rt-intro-text">
+              <li className="rt-intro-text huge">
                 Do not refresh the page or press the back button at any time.
               </li>
               <br />
@@ -180,7 +183,7 @@ class InfinityIntro extends Component {
             )}
 
           </ul>
-          {isChrome && this.state.allowed
+          {isChrome && this.state.allowed && this.props.correctness.id !== ''
             ? (
               <div className="inf-play-holder" onClick={this.begin}>
                 <div className="inf-play green">
@@ -189,7 +192,7 @@ class InfinityIntro extends Component {
               </div>
             )
             : (
-              <div />
+              <div>MTurk ID not found. Please edit the url to have your MTurk id after the &quot;.sh&quot;, for instance, https://jsanz-thesis-surge.sh/mturkidnumbers</div>
             )}
 
           {this.renderError()}
@@ -210,8 +213,9 @@ function mapStateToProps(reduxState) {
       user: reduxState.user,
       lesson: reduxState.lesson.currentLesson,
       lessonMaking: reduxState.lessonMaking,
+      correctness: reduxState.correctness,
     };
   }
 }
 
-export default withRouter(connect(mapStateToProps, { setUserHash, sendVideo })(InfinityIntro));
+export default withRouter(connect(mapStateToProps, { sendVideo, setUserHash })(InfinityIntro));
