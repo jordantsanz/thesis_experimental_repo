@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import { getUserInfo, setUserMTurkID } from '../actions';
 // import RhythmWrapper from './RhythmWrapper';
 import LessonWrapper from './LessonWrapper';
-import FaceApiTest from './FaceApiTest';
 // import Start from './Start';
 
 const App = (props) => {
@@ -38,7 +37,6 @@ const App = (props) => {
   return (
     <Router>
       <Switch>
-        <Route path="/test" component={FaceApiTest} />
         <Route path="/" component={LessonWrapper} />
       </Switch>
     </Router>

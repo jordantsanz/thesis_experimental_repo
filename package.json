@@ -31,7 +31,7 @@
     "test": "./node_modules/.bin/eslint src",
     "build": "yarn clean; NODE_ENV=production webpack --colors",
     "clean": "rimraf dist",
-    "deploy": "yarn build; surge -p dist -d https://jsanz-thesis.surge.sh; yarn clean"
+    "deploy": "yarn build; surge -p dist -d https://drumming-notation-study.surge.sh; yarn clean"
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
