@@ -47,7 +47,6 @@ class InfinityIntro extends Component {
       faceapi.nets.faceExpressionNet.loadFromUri('/models'),
     ]).then(() => { console.log('loaded'); });
     const successCallback = (stream) => {
-      console.log('stream: ', stream);
       // user allowed access to camera
       this.setState({ allowed: true, stream });
     };
@@ -62,7 +61,6 @@ class InfinityIntro extends Component {
   }
 
   componentWillUnmount = () => {
-    console.log('state stream: ', this.state.stream);
     if (this.state.stream !== '') {
       const { stream } = this.state;
       stream.getTracks().forEach((track) => {
@@ -97,7 +95,6 @@ class InfinityIntro extends Component {
 
   render() {
     const isChrome = !!window.chrome;
-    console.log('is chrome ', isChrome);
     return (
       <div className="infinity">
         {/* <RecordView /> */}
@@ -132,9 +129,6 @@ class InfinityIntro extends Component {
               When the activity starts, a metronome will count out four beats first. Then, you will play along to the metronome.
             </li>
             <br />
-            <li className="rt-intro-text">
-              The measure that the metronome is currently on will be highlighted in purple.
-            </li>
             <ul className="rt-intro-text-holder-list">
               <div className="rt-bold">Other notes:</div>
               <br />
@@ -204,7 +198,6 @@ class InfinityIntro extends Component {
 
 function mapStateToProps(reduxState) {
   if (window.location.pathname.split('/')[1] === 'createlesson') {
-    console.log('in lesson making');
     return {
       lesson: reduxState.lessonMaking,
     };

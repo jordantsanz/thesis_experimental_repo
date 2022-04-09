@@ -136,13 +136,12 @@ class VexNotes extends Component {
 
   setFill = (stave, measureNum) => {
     const newstave = stave;
-    if (this.props.highlightMeasure === measureNum) {
-      newstave.options.fill_style = '#8b3c99';
-      Vex.Flow.STAVE_LINE_THICKNESS = 1.5;
-    } else {
-      newstave.options.fill_style = 'black';
-      Vex.Flow.STAVE_LINE_THICKNESS = 1;
-    }
+    // if (this.props.highlightMeasure === measureNum) {
+    //   newstave.options.fill_style = '#8b3c99';
+    //   Vex.Flow.STAVE_LINE_THICKNESS = 1.5;
+    // } else {
+    newstave.options.fill_style = 'black';
+    Vex.Flow.STAVE_LINE_THICKNESS = 1;
     return newstave;
   }
 

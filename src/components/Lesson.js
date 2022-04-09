@@ -43,7 +43,6 @@ const Page = (props) => {
   } = useReactMediaRecorder({
     video: true, audio: true, onStop: stopped, blobPropertyBag: { type: 'video/mp4' },
   });
-  // console.log({ mediaBlobUrl });
 
   let { type } = props;
   if (type === undefined) {
@@ -165,14 +164,14 @@ class Lesson extends Component {
   }
 
   makeNewAttempt = (bpm) => {
-    console.log('make new attempt called');
     this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt, bpm);
   }
 
   goToNext = (attempts, type) => {
     // console.log('going to next!');
-    if (this.props.timerFinished) {
+    if (this.props.timerFinished || this.state.currentPage > 20) {
       this.setState({ proceedToEnd: true });
+      this.props.expireManually();
       return;
     }
     if (this.props.type === 'preview') {
@@ -191,13 +190,11 @@ class Lesson extends Component {
   }
 
   makePages = () => {
-    console.log('making pages');
     const { lesson } = this.props;
     // if (this.props.type === 'preview') {
     //   lesson = this.props.lessonMaking;
     //   console.log('lesson:', lesson);
     // }
-    console.log('the lesson', lesson);
     const pagesList = [];
     const instructionPagesList = [];
 
@@ -280,6 +277,10 @@ class Lesson extends Component {
     }
     this.setState({ determiningCompletion: false, pagesCompleted: false });
     this.props.resetAllCorrectness();
+    if (this.props.timerFinished || this.state.currentPage >= 20) {
+      this.setState({ proceedToEnd: true });
+      this.props.expireManually();
+    }
   }
 
   determineResult = () => {
@@ -329,10 +330,14 @@ class Lesson extends Component {
   render() {
     if (this.state.currentPage > 20 || this.state.proceedToEnd) {
       return (
-        <div className="rt-intro-text">
-          This is the end of the activities. Your payment string is {this.props.correctness.string}.
-          Please make sure to submit the Qualtrics survey as the final piece of this experiment.
-          Thank you for your time!
+        <div className="infinity">
+          <div className="infinity-body rt-results-page">
+            <div className="rt-intro-text">
+              This is the end of the activities. Your payment string is {this.props.correctness.string}.
+              Please make sure to submit the Qualtrics survey as the final piece of this experiment.
+              Thank you for your time!
+            </div>
+          </div>
         </div>
       );
     }

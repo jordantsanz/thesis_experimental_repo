@@ -23,7 +23,6 @@ const LessonWrapper = () => {
       const timerStats = { minutes: timer == null ? 0 : timer.minutes, seconds: timer == null ? 0 : timer.seconds };
       const stopwatchStats = { minutes, seconds };
       const string = randomstring.generate(19);
-      console.log('string: ', string);
       submitFinalTimeResults(userId, timerStats, stopwatchStats, string);
       dispatch({ type: ActionTypes.SET_FINAL_STRING, payload: { string } });
     },
@@ -35,19 +34,26 @@ const LessonWrapper = () => {
   const startStopwatch = () => {
     console.log('stopwatch started');
     start();
-    console.log('stopwatch: ', seconds);
   };
   const stopStopwatch = () => {
     console.log('stopwatch ended');
     pause();
-    console.log('stopwatch: ', seconds);
   };
 
-  console.log('stopwatch seconds:', seconds);
-  console.log('timer seconds: ', timer.seconds);
+  const expireManually = () => {
+    console.log('expire manually called');
+    timer.pause();
+    setTimerFinished(true);
+    const timerStats = { minutes: timer == null ? 0 : timer.minutes, seconds: timer == null ? 0 : timer.seconds };
+    const stopwatchStats = { minutes, seconds };
+    const string = randomstring.generate(19);
+    console.log('string: ', string);
+    submitFinalTimeResults(userId, timerStats, stopwatchStats, string);
+    dispatch({ type: ActionTypes.SET_FINAL_STRING, payload: { string } });
+  };
 
   return (
-    <Lesson timerFinished={timerFinished} startOverallTimer={startOverallTimer} startStopwatch={startStopwatch} stopStopwatch={stopStopwatch} />
+    <Lesson expireManually={expireManually} timerFinished={timerFinished} startOverallTimer={startOverallTimer} startStopwatch={startStopwatch} stopStopwatch={stopStopwatch} />
   );
 };
 

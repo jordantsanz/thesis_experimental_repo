@@ -757,12 +757,12 @@ const iPage1 = {
   For our exercises, four quarter notes fill up one measure,
   since there are four beats in a measure in our exercises.`,
 
-  text3: `For now, press the spacebar when there is a quarter note. 
+  text3: `For now, press the "b" button when there is a quarter note. 
   Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it. Notes will light up green if you got them correct,
-  and notes will light up red if you pressed the spacebar too early or late. 
+  and notes will light up red if you pressed the "b" button too early or late. 
 
-  Remember to press the spacebar to the beat! `,
+  Remember to press the "b" button to the beat! `,
   hasImage: true,
   image: '../images/quarter.png',
 };
@@ -783,7 +783,7 @@ const iPage2 = {
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar to the beat! `,
+  Remember to press the "b" button to the beat! `,
   hasImage: true,
   image: '../images/half.png',
 };
@@ -804,7 +804,7 @@ const iPage3 = {
   text3: `Scroll down for the activity; press the listen button to listen
   first, and then press start attempt when you're ready to try it.
 
-  Remember to press the spacebar to the beat! `,
+  Remember to press the "b" button to the beat! `,
   hasImage: true,
   image: '../images/whole.png',
 };
@@ -825,7 +825,7 @@ const iPage4 = {
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar to the beat! `,
+  Remember to press the "b" button to the beat! `,
   hasImage: true,
   image: '../images/eighth.png',
 };
@@ -844,7 +844,7 @@ const iPage5 = {
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar to the beat! `,
+  Remember to press the "b" button to the beat! `,
   hasImage: false,
   image: '',
 };
@@ -862,7 +862,7 @@ const iPage6 = {
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar to the beat! `,
+  Remember to press the "b" button to the beat! `,
   hasImage: false,
   image: '',
 };
@@ -877,14 +877,14 @@ const iPage7 = {
   on our staff. The bass drum corresponds to notes that are in the bottom space 
   on our staff. 
   
-  In the picture example, you would press your spacebar for the first and third quarter notes, 
+  In the picture example, you would press your "b" button for the first and third quarter notes, 
   and your "F" key for the second and fourth quarter notes. 
   `,
 
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, and your "F" key for 
+  Remember to press the "b" button for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: true,
   image: '../images/f-key.png',
@@ -894,17 +894,17 @@ const iPage8 = {
   title: 'Floor Tom - Half Notes',
   text1: `
 Continue playing notes with the bass drum and floor tom. Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   In the picture example, you would press your "F" key for the first half note, 
-  and your spacebar for the second half notes. 
+  and your "b" button for the second half notes. 
   `,
 
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, and your "F" key for 
+  Remember to press the "b" button for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: true,
   image: '../images/f-key-half.png',
@@ -914,7 +914,7 @@ const iPage9 = {
   title: 'Floor Tom - Whole Notes',
   text1: `
 Continue playing notes with the bass drum and floor tom. Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   This time, you will have quarter, half, and whole notes in your measures. Remember that a
@@ -925,7 +925,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, and your "F" key for 
+  Remember to press the "b" button for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: false,
   image: '',
@@ -935,7 +935,7 @@ const iPage10 = {
   title: 'Floor Tom - Eighth Notes',
   text1: `
 Continue playing notes with the bass drum and floor tom. Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   This time, you will have quarter, half, whole, and eighth notes in your measures. Remember that a
@@ -946,7 +946,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, and your "F" key for 
+  Remember to press the "b" button for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: false,
   image: '',
@@ -956,7 +956,7 @@ const iPage11 = {
   title: 'Floor Tom - Medium Speed',
   text1: `
 The speed has now increased slightly. Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   This time, you will have quarter, half, whole, and eighth notes in your measures. Remember that a
@@ -967,7 +967,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, and your "F" key for 
+  Remember to press the "b" button for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: false,
   image: '',
@@ -977,7 +977,7 @@ const iPage12 = {
   title: 'Floor Tom - Fast Speed',
   text1: `
 The speed is now even faster! Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   This time, you will have quarter, half, whole, and eighth notes in your measures. Remember that a
@@ -988,7 +988,7 @@ to your spacebar, and the floor tom (second space notes) corresponds to your "F"
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, and your "F" key for 
+  Remember to press the "b" button for the bottom space notes, and your "F" key for 
   the second space notes. `,
   hasImage: false,
   image: '',
@@ -999,19 +999,19 @@ const iPage13 = {
   text1: `
 Now we will introduce your final instrument: the hi-hat. The hi-hat corresponds to the "J" key on your keyboard. 
 Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   You should play the hi-hat key when the note appears in the third space on the staff. This is how 
   hi-hat notation is written for drum sheet music. 
   In the picture example, you would press the "F" key (bass drum) for the half note, the 
-  spacebar (floor tom) for the first quarter note, and the "J" key (hi-hat) for the second quarter note.
+  "b" button (floor tom) for the first quarter note, and the "J" key (hi-hat) for the second quarter note.
   `,
 
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, your "F" key for 
+  Remember to press the "b" button for the bottom space notes, your "F" key for 
   the second space notes, and the "J" key for the third space notes. `,
   hasImage: true,
   image: '../images/j-key.png',
@@ -1022,19 +1022,19 @@ const iPage14 = {
   text1: `
 Continue playing with your three instruments, now with quarter, half, and whole notes. The hi-hat corresponds to the "J" key on your keyboard. 
 Remember that the bass drum (the bottom space notes) corresponds
-to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
   `,
   text2: `
   You should play the hi-hat key when the note appears in the third space on the staff. This is how 
   hi-hat notation is written for drum sheet music. 
-  In the picture example, you would press the spacebar (bass drum) for the first quarter note, then
+  In the picture example, you would press the "b" button (bass drum) for the first quarter note, then
   press the "J" key for the second, third, and fourth quarter notes. 
   `,
 
   text3: `Scroll down for the activity; press the listen button to listen
   first, and press start attempt when you're ready to try it.
 
-  Remember to press the spacebar for the bottom space notes, your "F" key for 
+  Remember to press the "b" button for the bottom space notes, your "F" key for 
   the second space notes, and the "J" key for the third space notes. `,
   hasImage: true,
   image: '../images/j-key-two.png',
@@ -1045,7 +1045,7 @@ const iPage15 = {
   text1: `
   Continue playing with your three instruments, now with quarter, half, whole, and eighth notes. The hi-hat corresponds to the "J" key on your keyboard. 
   Remember that the bass drum (the bottom space notes) corresponds
-  to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+  to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
     `,
   text2: `
     You should play the hi-hat key when the note appears in the third space on the staff. This is how 
@@ -1055,7 +1055,7 @@ const iPage15 = {
   text3: `Scroll down for the activity; press the listen button to listen
     first, and press start attempt when you're ready to try it.
   
-    Remember to press the spacebar for the bottom space notes, your "F" key for 
+    Remember to press the "b" button for the bottom space notes, your "F" key for 
     the second space notes, and the "J" key for the third space notes. `,
   hasImage: false,
   image: '',
@@ -1066,7 +1066,7 @@ const iPage16 = {
   text1: `
   The speed has now been slightly increased. Remember that the hi-hat corresponds to the "J" key on your keyboard,
   the bass drum (the bottom space notes) corresponds
-  to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+  to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
     `,
   text2: `
     You should play the hi-hat key when the note appears in the third space on the staff. This is how 
@@ -1076,7 +1076,7 @@ const iPage16 = {
   text3: `Scroll down for the activity; press the listen button to listen
     first, and press start attempt when you're ready to try it.
   
-    Remember to press the spacebar for the bottom space notes, your "F" key for 
+    Remember to press the "b" button for the bottom space notes, your "F" key for 
     the second space notes, and the "J" key for the third space notes. `,
   hasImage: false,
   image: '',
@@ -1087,7 +1087,7 @@ const iPage17 = {
   text1: `
   The speed is now even faster. Remember that the hi-hat corresponds to the "J" key on your keyboard,
   the bass drum (the bottom space notes) corresponds
-  to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+  to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
     `,
   text2: `
     You should play the hi-hat key when the note appears in the third space on the staff. This is how 
@@ -1097,7 +1097,7 @@ const iPage17 = {
   text3: `Scroll down for the activity; press the listen button to listen
     first, and press start attempt when you're ready to try it.
   
-    Remember to press the spacebar for the bottom space notes, your "F" key for 
+    Remember to press the "b" button for the bottom space notes, your "F" key for 
     the second space notes, and the "J" key for the third space notes. `,
   hasImage: false,
   image: '',
@@ -1113,13 +1113,13 @@ and an eighth note takes up half of a beat.
   text2: `
   Remember that the hi-hat corresponds to the "J" key on your keyboard,
   the bass drum (the bottom space notes) corresponds
-  to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+  to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
     `,
 
   text3: `Scroll down for the activity; press the listen button to listen
     first, and press start attempt when you're ready to try it.
   
-    Remember to press the spacebar for the bottom space notes, your "F" key for 
+    Remember to press the "b" button for the bottom space notes, your "F" key for 
     the second space notes, and the "J" key for the third space notes. `,
   hasImage: false,
   image: '',
@@ -1135,13 +1135,13 @@ and an eighth note takes up half of a beat.
   text2: `
   Remember that the hi-hat corresponds to the "J" key on your keyboard,
   the bass drum (the bottom space notes) corresponds
-  to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+  to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
     `,
 
   text3: `Scroll down for the activity; press the listen button to listen
     first, and press start attempt when you're ready to try it.
   
-    Remember to press the spacebar for the bottom space notes, your "F" key for 
+    Remember to press the "b" button for the bottom space notes, your "F" key for 
     the second space notes, and the "J" key for the third space notes. `,
   hasImage: false,
   image: '',
@@ -1157,13 +1157,13 @@ and an eighth note takes up half of a beat.
   text2: `
   Remember that the hi-hat corresponds to the "J" key on your keyboard,
   the bass drum (the bottom space notes) corresponds
-  to your spacebar, and the floor tom (second space notes) corresponds to your "F" key.
+  to your "b" button, and the floor tom (second space notes) corresponds to your "F" key.
     `,
 
   text3: `Scroll down for the activity; press the listen button to listen
     first, and press start attempt when you're ready to try it.
   
-    Remember to press the spacebar for the bottom space notes, your "F" key for 
+    Remember to press the "b" button for the bottom space notes, your "F" key for 
     the second space notes, and the "J" key for the third space notes. `,
   hasImage: false,
   image: '',

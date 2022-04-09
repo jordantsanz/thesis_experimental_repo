@@ -115,9 +115,10 @@ export function sendVideo(video, id, lesson_id, attempt) {
       const percent = calculateAffectPercent(res.data);
       axios.put(`${ROOT_URL_DATABASE}/affect`, {
         percent, id, lesson_id, attempt, dataframe: res.data,
+      }).then((res2) => {
+        console.log('res 2 from affect:', res2);
+        dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
       });
-
-      dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
     });
   });
 }
