@@ -393,7 +393,7 @@ class Lesson extends Component {
           </div>
         );
         ///  NEED TO CHANGE FOR REAL: should be facialAffect !== -1 for face condition
-      } else if (this.state.determiningCompletion && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1) {
+      } else if (this.state.determiningCompletion && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1 && this.props.correctness.affectPercent !== -1) {
         return (
           <div className="infinity">
             <div className="infinity-body rt-results-page">

@@ -12,12 +12,12 @@ import premadeLessons from '../lib/PremadeLessons';
 const ROOT_URL = '';
 // url for face detection
 // LOCAL:
-// const VIDEO_URL = 'http://127.0.0.1:8000';
+const VIDEO_URL = 'http://10.132.59.219:8080';
 // PROD:
 // const VIDEO_URL = 'https://thesis-backend-jsanz.onrender.com';
 // url for database
 // const VIDEO_URL = 'https://jsanz-thesis-new-backend.ue.r.appspot.com';
-const VIDEO_URL = 'https://jsanz-thesis-new-backend-2rfzh6lqca-uk.a.run.app';
+// const VIDEO_URL = 'https://jsanz-thesis-new-backend-2rfzh6lqca-uk.a.run.app';
 
 // LOCAL:
 // const ROOT_URL_DATABASE = 'http://localhost:9090/api';
