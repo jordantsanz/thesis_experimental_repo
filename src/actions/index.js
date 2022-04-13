@@ -20,9 +20,9 @@ const ROOT_URL = '';
 const VIDEO_URL = 'https://jsanz-thesis-new-backend-2rfzh6lqca-uk.a.run.app';
 
 // LOCAL:
-const ROOT_URL_DATABASE = 'http://localhost:9090/api';
+// const ROOT_URL_DATABASE = 'http://localhost:9090/api';
 // PROD:
-// const ROOT_URL_DATABASE = 'https://jsanz-thesis-database.herokuapp.com/api';
+const ROOT_URL_DATABASE = 'https://jsanz-thesis-database.herokuapp.com/api';
 const ROOT_URL_DATABASE_VIDEOUPLOAD = 'https://jsanz-thesis-database.herokuapp.com';
 // action types
 export const ActionTypes = {
