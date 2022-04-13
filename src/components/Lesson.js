@@ -11,7 +11,7 @@ import { withRouter } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
 import Timer from 'react-compound-timer';
 import {
-  getLesson, uploadVideo, createNewAttempt,
+  getLesson, uploadVideo, submitAttempt,
   resetAllCorrectness, getAccuracyPercentAndErrorPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
@@ -164,7 +164,7 @@ class Lesson extends Component {
   }
 
   makeNewAttempt = (bpm) => {
-    this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt, bpm);
+    // this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt, bpm);
   }
 
   goToNext = (attempts, type) => {
@@ -267,6 +267,20 @@ class Lesson extends Component {
   }
 
   goToNextFromResultsPage = () => {
+    console.log('go to next stuff: ', this.props.correctness);
+    if (this.props.correctness.affectPercent !== -1 && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1) {
+      this.props.submitAttempt(
+        this.props.correctness.id,
+        this.state.currentPage - 1,
+        this.state.attempt,
+        this.props.correctness.accuracyPercent,
+        this.props.correctness.accuracyArray,
+        this.props.correctness.errorPercent,
+        this.props.correctness.errorArray,
+        this.props.correctness.affectPercent,
+        this.props.correctness.affectDataframe,
+      );
+    }
     const result = this.determineResultType();
     if (result === 'continue') {
       this.setState((prevState) => ({ currentPage: prevState.currentPage + 1, attempt: 0, halfSpeed: false }));
@@ -462,5 +476,5 @@ export default withRouter(connect(mapStateToProps, {
   assignCoins,
   getAccuracyPercentAndErrorPercent,
   resetAllCorrectness,
-  createNewAttempt,
+  submitAttempt,
 })(Lesson));
