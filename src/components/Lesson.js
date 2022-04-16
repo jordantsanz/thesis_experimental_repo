@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
 import Timer from 'react-compound-timer';
+import { Dots } from 'loading-animations-react';
 import {
   getLesson, uploadVideo, submitAttempt,
   resetAllCorrectness, getAccuracyPercentAndErrorPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
@@ -346,7 +347,7 @@ class Lesson extends Component {
       return (
         <div className="infinity">
           <div className="infinity-body rt-results-page">
-            <div className="rt-intro-text">
+            <div className="infinity-title infinity-title-top">
               This is the end of the activities. Your payment string is {this.props.correctness.string}.
               Please make sure to submit the Qualtrics survey as the final piece of this experiment.
               Thank you for your time!
@@ -434,8 +435,14 @@ class Lesson extends Component {
       } else if (this.state.determiningCompletion && this.props.correctness.affectPercent === -1) {
         return (
           <div className="infinity">
-            <div className="infinity-body rt-results-page">
+            <div className="infinity-body rt-results-page flex-center-rt">
               <div className="infinity-title infinity-title-top">Calculating Results...do NOT refresh!</div>
+              <div className="rt-lesson-text-1">This may take up to one minute to process. Please wait!</div>
+              <Dots id="loading-dots"
+                dotColors={['red', 'white', 'blue', '#123abc', 'rgb(50,50,50)',
+                  'hsla(235, 100%, 50%, .5)']}
+                text="Loading...please wait!"
+              />
             </div>
           </div>
         );

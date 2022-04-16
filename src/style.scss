@@ -9352,3 +9352,15 @@ letter-spacing: 0.03em;
     font-size: 40px;
     font-weight: bold;
 }
+
+.flex-center-rt{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#loading-dots{
+    font-size: 25px;
+    font-family: $josefin
+}

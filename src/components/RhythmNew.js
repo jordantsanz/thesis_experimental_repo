@@ -375,12 +375,6 @@ class RhythmNew extends Component {
     return millisecondsPerBeat;
   }
 
-  playMetronomeSound = () => {
-    this.state.metronomeAudio.volume = 0.3;
-    // this.state.metronomeAudio.pause();
-    this.state.metronomeAudio.play();
-  }
-
   convertNoteCodeToMilliseconds = (duration, beatsPerSecond) => {
     let noteValue = 0;
     if (duration === '8') {
@@ -398,9 +392,13 @@ class RhythmNew extends Component {
 
   handleCheckpoint = (isMetronome, isCurNote, isValidNote, time, curNoteVal) => {
     console.log(curNoteVal, 'curNoteVal');
-    if (isMetronome) {
+    if (isMetronome && (!isCurNote || !this.state.listening)) {
       this.state.metronomeAudio.volume = 0.3;
       this.state.metronomeAudio.play();
+      this.startCountdown(4);
+    }
+
+    if (isMetronome && isCurNote && this.state.countDownNumber === 1) {
       this.startCountdown(4);
     }
     // current note checkpoint

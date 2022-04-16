@@ -12,7 +12,7 @@ import premadeLessons from '../lib/PremadeLessons';
 const ROOT_URL = '';
 // url for face detection
 // LOCAL:
-// const VIDEO_URL = 'http://10.132.59.219:8080';
+// const VIDEO_URL = 'http://172.27.191.206:8080';
 // PROD:
 // const VIDEO_URL = 'https://thesis-backend-jsanz.onrender.com';
 // url for database
@@ -90,6 +90,14 @@ export function makeContentPage(lessonid, fields) {
   });
 }
 
+export function failed() {
+  console.log('failed');
+  return ((dispatch) => {
+    console.log('dispatching');
+    dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: -2, affectDataframe: {} } });
+  });
+}
+
 export function sendVideo(video, id, lesson_id, attempt) {
   console.log('actions send video', id);
   return ((dispatch) => {
@@ -97,19 +105,24 @@ export function sendVideo(video, id, lesson_id, attempt) {
     formData.append('video', video);
     console.log(video, 'video');
     console.log('sending video');
-    axios.post(`${VIDEO_URL}/video`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then((res) => {
-      console.log('response received from video send', res);
-      const percent = calculateAffectPercent(res.data);
-      // axios.put(`${ROOT_URL_DATABASE}/createAttempt`, {
-      //   percent, id, lesson_id, attempt, dataframe: res.data,
-      // }).then((res2) => {
-      //   console.log('res 2 from affect:', res2);
-      dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent, affectDataframe: res.data } });
-    });
+    try {
+      axios.post(`${VIDEO_URL}/video`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }).then((res) => {
+        console.log('response received from video send', res);
+        const percent = calculateAffectPercent(res.data);
+        // axios.put(`${ROOT_URL_DATABASE}/createAttempt`, {
+        //   percent, id, lesson_id, attempt, dataframe: res.data,
+        // }).then((res2) => {
+        //   console.log('res 2 from affect:', res2);
+        dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent, affectDataframe: res.data } });
+      });
+    } catch {
+      console.log('dispatching');
+      dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: -2, affectDataframe: {} } });
+    }
   });
 }
 
