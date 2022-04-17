@@ -280,6 +280,7 @@ class Lesson extends Component {
         this.props.correctness.errorArray,
         this.props.correctness.affectPercent,
         this.props.correctness.affectDataframe,
+        this.state.bpm,
       );
     }
     const result = this.determineResultType();

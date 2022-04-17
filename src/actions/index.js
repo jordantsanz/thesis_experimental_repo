@@ -191,7 +191,7 @@ export function getErrorPercent(errorArray, id, lesson_id, attempt) {
   });
 }
 
-export function submitAttempt(userId, lesson_id, attempt, accuracyPercent, accuracyArray, errorPercent, errorArray, affectPercent, affectDataframe) {
+export function submitAttempt(userId, lesson_id, attempt, accuracyPercent, accuracyArray, errorPercent, errorArray, affectPercent, affectDataframe, bpm) {
   console.log('before dispatch submit: ', accuracyPercent, accuracyArray, errorPercent, errorArray, affectDataframe, affectPercent);
   return ((dispatch) => {
     console.log('submit attempt called');
@@ -206,6 +206,7 @@ export function submitAttempt(userId, lesson_id, attempt, accuracyPercent, accur
         errorArray,
         affectPercent,
         affectDataframe,
+        bpm,
       });
   });
 }

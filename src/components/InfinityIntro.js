@@ -186,7 +186,9 @@ class InfinityIntro extends Component {
               </div>
             )
             : (
-              <div>MTurk ID not found. Please edit the url to have your MTurk id after the &quot;.sh&quot;, for instance, https://jsanz-thesis-surge.sh/mturkidnumbers</div>
+              <div>MTurk ID not found, or you are not using google chrome.
+                Please use Google Chrome, and please edit the url to have your MTurk id after the &quot;.sh&quot;, for instance, https://jsanz-thesis-surge.sh/mturkidnumbers
+              </div>
             )}
 
           {this.renderError()}
