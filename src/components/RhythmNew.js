@@ -1,6 +1,8 @@
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Timer from 'tiny-timer';
+import { registerClick } from '../actions';
 import VexNotes from './Vex';
 import metronomeSound from '../../sounds/metronomeSound.wav';
 import bassDrum from '../../sounds/bassDrum.mp3';
@@ -100,7 +102,8 @@ class RhythmNew extends Component {
     const beatsPerSecond = this.props.bpm / 60;
     const millisecondsPerBeat = this.calculateMetronomeHitInterval(beatsPerSecond);
     const correctKey = this.props.keys[this.state.currNote];
-    const correctTime = this.state.curNoteTimeHits[this.state.currNote] - millisecondsPerBeat;
+    const correctTime = this.state.curNoteTimeHits[this.state.colorsArray.length - 1] - millisecondsPerBeat;
+    console.log('correct time: ', correctTime);
     const { colorsArray, errorArray, accuracyArray } = this.state;
 
     console.log('processed and correct: ', processedTime, correctTime);
@@ -115,7 +118,7 @@ class RhythmNew extends Component {
     if (processedTime == null) {
       console.log('processed time is null: ', processedTime);
     }
-    const error = Math.abs(correctTime - processedTime);
+    let error = Math.abs(correctTime - processedTime);
     console.log('error: ', error);
     if (error == null) {
       console.log('error is null: ', error);
@@ -124,8 +127,9 @@ class RhythmNew extends Component {
       console.log('is nan: ', error);
       console.log('correct and precessoed: ', correctTime, processedTime);
     }
-    if (error > 400) {
+    if (error > 500) {
       console.log('error now above 400');
+      error = 500;
     }
     const pressedCorrectKey = correctKey === key;
 
@@ -247,7 +251,9 @@ class RhythmNew extends Component {
 
     // build times that each metronome is hit
     const metronomeHitTimes = [0, introTime * 1, introTime * 2, introTime * 3];
-    for (let i = 0; i < 48; i += 1) {
+    const metronomeCount = this.props.lesson_id === 0 ? 12 : 48;
+    console.log('lessonid: ', this.props.lesson_id, metronomeCount);
+    for (let i = 0; i < metronomeCount; i += 1) {
       metronomeHitTimes.push((i * millisecondsPerBeat) + introTime * 4);
     }
 
@@ -367,6 +373,7 @@ class RhythmNew extends Component {
         maxKey = keys[i];
       }
     }
+    console.log('checkpoints: ', checkpointsDict);
     this.setState({ checkpoints: checkpointsDict, maxKey });
   }
 
@@ -409,7 +416,7 @@ class RhythmNew extends Component {
       if (colorsArray.length > 0 && colorsArray[colorsArray.length - 1] === 'blue') {
         console.log('made red in colors array length and is blue');
         colorsArray[this.state.currNote] = this.state.listening ? 'green' : 'red';
-        errorArray[this.state.currNote] = 400;
+        errorArray[this.state.currNote] = 500;
         accuracyArray[this.state.currNote] = 0;
       }
       if (colorsArray[this.state.currNote + 1] === 'red') {
@@ -443,7 +450,7 @@ class RhythmNew extends Component {
         if (!this.state.listening) {
           console.log('made red in not listening block');
           colorsArray[this.state.currNote] = 'red';
-          errorArray[this.state.currNote] = 400;
+          errorArray[this.state.currNote] = 500;
           accuracyArray[this.state.currNote] = 0;
         }
         this.setState({ colorsArray, rerender: true });
@@ -516,6 +523,7 @@ class RhythmNew extends Component {
   }
 
   playAnswer = () => {
+    this.props.registerClick('listeningClick');
     this.setState({
       playing: true, foundFinal: false, listening: true, rerender: true,
     });
@@ -545,6 +553,7 @@ class RhythmNew extends Component {
   }
 
   attemptExercise = () => {
+    this.props.registerClick('attemptExercise');
     this.props.startRecording();
     this.props.startStopwatch();
     const beatsPerSecond = this.props.bpm / 60;
@@ -573,6 +582,7 @@ class RhythmNew extends Component {
   }
 
   stopListening = () => {
+    this.props.registerClick('cancelListen');
     this.setState({
       listening: false,
       colorsArray: [],
@@ -686,4 +696,4 @@ class RhythmNew extends Component {
     );
   }
 }
-export default RhythmNew;
+export default connect(null, { registerClick })(RhythmNew);

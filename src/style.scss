@@ -6558,7 +6558,6 @@ margin-bottom: 15px;
     list-style-type: square;
     font-size: 26px;
     padding-top: 20px;
-    width: 85%;
 }
 
 .rt-bold{
@@ -6581,6 +6580,11 @@ margin-bottom: 15px;
     letter-spacing: 0.03em;
     margin-left: 59px;
     color: #D33131;
+}
+
+.rt-big-text{
+    text-align: center;
+    width: 100%;
 }
 
 .infinity-activity-type-word{
@@ -9345,7 +9349,6 @@ letter-spacing: 0.03em;
 
 .rt-big-text{
     font-size: 38px;
-    width: 85%;
 }
 
 .huge{
@@ -9363,4 +9366,50 @@ letter-spacing: 0.03em;
 #loading-dots{
     font-size: 25px;
     font-family: $josefin
+}
+
+.infinity-text-component-flex{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.infinity-text-holder-component{
+    width: 70%;
+    height: 50vh;
+    border-radius: 10px;
+    box-shadow: 0px 1px 3px 1px rgba(0,0,0,0.16), 2px 6px 9px 3px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.infinity-text-holder-text{
+    width: 70%;
+    text-align: center;
+    font-size: 30px;
+}
+
+.rt-intro-text-instructions{
+    text-align: center;
+    font-size: 35px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.infinity-instructions-image{
+    max-width: 300px;
+    max-height: 150px;
+}
+
+.arrow-button:hover{
+    cursor: pointer;
+    fill: lightblue;
+    color: lightblue;
+}
+
+.arrow-button{
+    transition: 100ms;
 }

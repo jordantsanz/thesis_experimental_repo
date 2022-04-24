@@ -1,3 +1,4 @@
+/* eslint-disable no-eval */
 /* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint-disable eqeqeq */
@@ -12,7 +13,7 @@ import premadeLessons from '../lib/PremadeLessons';
 const ROOT_URL = '';
 // url for face detection
 // LOCAL:
-// const VIDEO_URL = 'http://172.27.191.206:8080';
+// const VIDEO_URL = 'http://127.0.0.1:8080';
 // PROD:
 // const VIDEO_URL = 'https://thesis-backend-jsanz.onrender.com';
 // url for database
@@ -98,6 +99,76 @@ export function failed() {
   });
 }
 
+// function parseResponse(data) {
+//   const json = JSON.stringify(data);
+//   console.log('string json: ', json);
+//   const parseJson = JSON.parse(json);
+//   console.log('parse json: ', parseJson);
+//   const { raw, means } = parseJson;
+//   // eslint-disable-next-line guard-for-in
+//   for (const k in parseJson) {
+//     console.log('key: ', k);
+//   }
+//   console.log('raw and means: ', raw, means);
+
+//   const {
+//     anger, sadness, fear, disgust, neutral, happiness,
+//   } = JSON.parse(JSON.stringify(raw));
+//   const angerR = anger;
+//   const sadnessR = sadness;
+//   const fearR = fear;
+//   const disgustR = disgust;
+//   const neutralR = neutral;
+//   const happinessR = happiness;
+
+//   console.log('emotions: ', angerR, sadnessR, fearR, disgustR, neutralR, happinessR);
+
+//   const parseMeans = JSON.parse(JSON.stringify(means));
+//   const angerM = parseMeans.anger;
+//   const sadnessM = parseMeans.sadness;
+//   const fearM = parseMeans.fear;
+//   const disgustM = parseMeans.disgust;
+//   const neutralM = parseMeans.neutral;
+//   const happinessM = parseMeans.happiness;
+
+//   console.log('means: ', angerM, sadnessM, fearM, disgustM, neutralM, happinessM);
+
+//   const finalJson = {
+//     raw: {
+//       anger: angerR,
+//       sadness: sadnessR,
+//       fear: fearR,
+//       disgust: disgustR,
+//       neutral: neutralR,
+//       happiness: happinessR,
+//     },
+//     means: {
+//       anger: angerM,
+//       sadness: sadnessM,
+//       fear: fearM,
+//       disgust: disgustM,
+//       neutral: neutralM,
+//       happiness: happinessM,
+//     },
+//   };
+//   console.log('final JSON: ', finalJson);
+//   return finalJson;
+// }
+
+export function registerClick(clickType) {
+  return ((dispatch) => {
+    console.log('register click');
+    axios.post(`${ROOT_URL_DATABASE}/click`, { clickType })
+      .then((res) => {
+        console.log('response from click: ', res);
+      })
+
+      .catch((err) => {
+        console.log('error doing click call: ', err);
+      });
+  });
+}
+
 export function sendVideo(video, id, lesson_id, attempt) {
   console.log('actions send video', id);
   return ((dispatch) => {
@@ -111,7 +182,7 @@ export function sendVideo(video, id, lesson_id, attempt) {
           'Content-Type': 'multipart/form-data',
         },
       }).then((res) => {
-        console.log('response received from video send', res);
+        console.log('res data', res.data);
         const percent = calculateAffectPercent(res.data);
         // axios.put(`${ROOT_URL_DATABASE}/createAttempt`, {
         //   percent, id, lesson_id, attempt, dataframe: res.data,

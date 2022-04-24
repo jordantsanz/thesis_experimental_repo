@@ -12,7 +12,7 @@ import { useReactMediaRecorder } from 'react-media-recorder';
 import Timer from 'react-compound-timer';
 import { Dots } from 'loading-animations-react';
 import {
-  getLesson, uploadVideo, submitAttempt,
+  getLesson, uploadVideo, submitAttempt, registerClick,
   resetAllCorrectness, getAccuracyPercentAndErrorPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
@@ -88,6 +88,7 @@ const Page = (props) => {
             registerCompletion={props.registerCompletion}
             stopRecording={stopRecording}
             startRecording={startRecording}
+            lesson_id={props.lesson_id}
             // bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
             bpm={props.page.info.r.bpm}
             startStopwatch={props.startStopwatch}
@@ -169,6 +170,7 @@ class Lesson extends Component {
   }
 
   goToNext = (attempts, type) => {
+    this.props.registerClick('NextbuttonClicked');
     // console.log('going to next!');
     if (this.props.timerFinished || this.state.currentPage > 20) {
       this.setState({ proceedToEnd: true });
@@ -263,6 +265,7 @@ class Lesson extends Component {
   }
 
   beginInfinityLesson = (activityTypes, clef) => {
+    this.props.registerClick('InitialBeginButton');
     this.props.getRandomLesson(this.props.history, activityTypes, clef);
     this.setState({ intro: false });
   }
@@ -485,4 +488,5 @@ export default withRouter(connect(mapStateToProps, {
   getAccuracyPercentAndErrorPercent,
   resetAllCorrectness,
   submitAttempt,
+  registerClick,
 })(Lesson));
