@@ -178,11 +178,13 @@ class Lesson extends Component {
       return;
     }
     if (this.props.type === 'preview') {
+      this.props.registerClick('DeterminingClicked');
       this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
     } else {
       // console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
         if (!this.state.random) {
+          this.props.registerClick('LessonCompleteClicked');
           this.props.registerLessonCompletion(this.props.lesson._id, this.props.user.id);
         }
         this.props.getUserInfo();
@@ -296,7 +298,7 @@ class Lesson extends Component {
     }
     this.setState({ determiningCompletion: false, pagesCompleted: false });
     this.props.resetAllCorrectness();
-    if (this.props.timerFinished || this.state.currentPage >= 20) {
+    if (this.props.timerFinished || this.state.currentPage >= 17) {
       this.setState({ proceedToEnd: true });
       this.props.expireManually();
     }
@@ -347,14 +349,19 @@ class Lesson extends Component {
   }
 
   render() {
-    if (this.state.currentPage > 20 || this.state.proceedToEnd) {
+    if (this.state.currentPage > 17 || this.state.proceedToEnd) {
       return (
         <div className="infinity">
           <div className="infinity-body rt-results-page">
-            <div className="infinity-title infinity-title-top">
-              This is the end of the activities. Your payment string is {this.props.correctness.string}.
-              Please make sure to submit the Qualtrics survey as the final piece of this experiment.
-              Thank you for your time!
+            <div className="infinity-final-rt">
+              <div className="infinity-final-rt-text"> This is the end of the activities. Your payment string is {this.props.correctness.string}. </div>
+              <br />
+              <div className="infinity-final-rt-text">Please submit the original survey.</div>
+              <br />
+              <div className="infinity-final-rt-text"> NOW, PLEASE FILL OUT THIS VERY BRIEF EXIT SURVEY. YOU WILL NOT BE PAID IF YOU DO NOT FILL OUT THE EXIT SURVEY:</div>
+              <a className="infinity-final-rt-text" href="https://dartmouth.co1.qualtrics.com/jfe/form/SV_9oQEgX4NOEMgKge">https://dartmouth.co1.qualtrics.com/jfe/form/SV_9oQEgX4NOEMgKge</a>
+
+              <div className="infinity-final-rt-text"> You can then close this tab.</div>
             </div>
           </div>
         </div>

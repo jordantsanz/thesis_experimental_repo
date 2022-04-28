@@ -123,7 +123,6 @@ class InfinityIntro extends Component {
               <InfinityText page={this.state.infinityTextPage} />
               <FontAwesomeIcon className="arrow-button fa-lg" icon={faArrowCircleRight} onClick={() => { this.changeInfinityText(1); }} />
             </div>
-
             <br />
             <br />
             <br />

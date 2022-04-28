@@ -9413,3 +9413,19 @@ letter-spacing: 0.03em;
 .arrow-button{
     transition: 100ms;
 }
+
+.infinity-final-rt{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    font-size: 20px;
+    line-height: 20px;
+    height: 80vh;
+    width: 100%;
+}
+
+.infinity-final-rt-text{
+    font-size: 20px;
+    line-height: 20px;
+}

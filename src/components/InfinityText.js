@@ -45,7 +45,7 @@ Other notes:`,
 
   '                Please ensure your face is always in the frame of the camera.',
 
-  '                Turn your sound on. Do not use bluetooth headphones. Try wired headphones or play sounds on your computer speakers.',
+  '                Turn your sound on. If you experience difficulty with bluetooth headphones, try wired headphones or play sounds on your computer speakers.',
 
   '                Do not refresh the page or press the back button at any time.',
   '              Please read each lesson and instructions carefully.',

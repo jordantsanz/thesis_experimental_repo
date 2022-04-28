@@ -183,6 +183,7 @@ export function sendVideo(video, id, lesson_id, attempt) {
         },
       }).then((res) => {
         console.log('res data', res.data);
+        registerClick('videoResultsReturned');
         const percent = calculateAffectPercent(res.data);
         // axios.put(`${ROOT_URL_DATABASE}/createAttempt`, {
         //   percent, id, lesson_id, attempt, dataframe: res.data,

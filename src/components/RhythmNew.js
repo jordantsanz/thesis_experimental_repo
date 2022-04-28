@@ -186,6 +186,9 @@ class RhythmNew extends Component {
       colorsArray[this.state.currNote] = 'red';
     } else {
       console.log('correct hit');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray[this.state.currNote] = 'green';
       accuracyArray[this.state.currNote] = 1;
     }
@@ -251,7 +254,7 @@ class RhythmNew extends Component {
 
     // build times that each metronome is hit
     const metronomeHitTimes = [0, introTime * 1, introTime * 2, introTime * 3];
-    const metronomeCount = this.props.lesson_id === 0 ? 12 : 48;
+    const metronomeCount = this.props.lesson_id === 0 ? 16 : 48;
     console.log('lessonid: ', this.props.lesson_id, metronomeCount);
     for (let i = 0; i < metronomeCount; i += 1) {
       metronomeHitTimes.push((i * millisecondsPerBeat) + introTime * 4);
@@ -415,6 +418,9 @@ class RhythmNew extends Component {
       const { colorsArray, errorArray, accuracyArray } = this.state;
       if (colorsArray.length > 0 && colorsArray[colorsArray.length - 1] === 'blue') {
         console.log('made red in colors array length and is blue');
+        if (colorsArray.length >= this.state.vexNotes.length) {
+          return;
+        }
         colorsArray[this.state.currNote] = this.state.listening ? 'green' : 'red';
         errorArray[this.state.currNote] = 500;
         accuracyArray[this.state.currNote] = 0;
@@ -422,6 +428,9 @@ class RhythmNew extends Component {
       if (colorsArray[this.state.currNote + 1] === 'red') {
         console.log('already answered too early');
       } else {
+        if (colorsArray.length >= this.state.vexNotes.length) {
+          return;
+        }
         colorsArray[this.state.currNote + 1] = this.state.listening ? 'green' : 'blue';
       }
 
@@ -449,6 +458,9 @@ class RhythmNew extends Component {
       if (colorsArray[this.state.currNote] === 'blue') {
         if (!this.state.listening) {
           console.log('made red in not listening block');
+          if (colorsArray.length >= this.state.vexNotes.length) {
+            return;
+          }
           colorsArray[this.state.currNote] = 'red';
           errorArray[this.state.currNote] = 500;
           accuracyArray[this.state.currNote] = 0;
