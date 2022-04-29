@@ -13,7 +13,7 @@ import premadeLessons from '../lib/PremadeLessons';
 const ROOT_URL = '';
 // url for face detection
 // LOCAL:
-// const VIDEO_URL = 'http://127.0.0.1:8080';
+// const VIDEO_URL = 'http://10.135.166.47:8080';
 // PROD:
 // const VIDEO_URL = 'https://thesis-backend-jsanz.onrender.com';
 // url for database
