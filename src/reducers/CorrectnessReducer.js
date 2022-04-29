@@ -4,6 +4,9 @@ const initialState = {
   affectPercent: -1,
   accuracyPercent: -1,
   errorPercent: -1,
+  errorArray: [],
+  accuracyArray: [],
+  affectDataframe: {},
   id: '',
   string: '',
 };
@@ -15,6 +18,7 @@ const correctnessReducer = (state = initialState, action) => {
       return {
         ...state,
         affectPercent: action.payload.affectPercent,
+        affectDataframe: action.payload.affectDataframe,
       };
     case ActionTypes.RESET_ALL_CORRECTNESS:
       console.log('reset all correctness called');
@@ -23,6 +27,9 @@ const correctnessReducer = (state = initialState, action) => {
         affectPercent: -1,
         accuracyPercent: -1,
         errorPercent: -1,
+        errorArray: [],
+        accuracyArray: [],
+        affectDataframe: {},
       };
     case ActionTypes.GET_ACCURACY_AND_ERROR_PERCENT:
       console.log('accuracy set called');
@@ -30,6 +37,8 @@ const correctnessReducer = (state = initialState, action) => {
         ...state,
         accuracyPercent: action.payload.accuracyPercent,
         errorPercent: action.payload.errorPercent,
+        errorArray: action.payload.errorArray,
+        accuracyArray: action.payload.accuracyArray,
       };
     case ActionTypes.GET_ERROR_PERCENT:
       console.log('error set called');

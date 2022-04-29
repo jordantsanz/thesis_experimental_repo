@@ -10,8 +10,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
 import Timer from 'react-compound-timer';
+import { Dots } from 'loading-animations-react';
 import {
-  getLesson, uploadVideo, createNewAttempt,
+  getLesson, uploadVideo, submitAttempt, registerClick,
   resetAllCorrectness, getAccuracyPercentAndErrorPercent, sendVideo, assignXP, updateUserStats, getRandomLesson, registerLessonCompletion, registerLessonAttempt, getUserInfo, updateLevel, assignCoins,
 } from '../actions';
 import ViewContent from './ViewContent';
@@ -87,6 +88,7 @@ const Page = (props) => {
             registerCompletion={props.registerCompletion}
             stopRecording={stopRecording}
             startRecording={startRecording}
+            lesson_id={props.lesson_id}
             // bpm={props.halfSpeed ? 55 : props.page.info.r.bpm}
             bpm={props.page.info.r.bpm}
             startStopwatch={props.startStopwatch}
@@ -164,10 +166,11 @@ class Lesson extends Component {
   }
 
   makeNewAttempt = (bpm) => {
-    this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt, bpm);
+    // this.props.createNewAttempt(this.props.correctness.id, this.state.currentPage - 1, this.state.attempt, bpm);
   }
 
   goToNext = (attempts, type) => {
+    this.props.registerClick('NextbuttonClicked');
     // console.log('going to next!');
     if (this.props.timerFinished || this.state.currentPage > 20) {
       this.setState({ proceedToEnd: true });
@@ -175,11 +178,13 @@ class Lesson extends Component {
       return;
     }
     if (this.props.type === 'preview') {
+      this.props.registerClick('DeterminingClicked');
       this.setState((prevstate) => ({ pagesCompleted: true, determiningCompletion: true }));
     } else {
       // console.log('going to next!!', type, attempts);
       if (this.state.currentPage > this.props.lesson.pages.length - 1) {
         if (!this.state.random) {
+          this.props.registerClick('LessonCompleteClicked');
           this.props.registerLessonCompletion(this.props.lesson._id, this.props.user.id);
         }
         this.props.getUserInfo();
@@ -262,11 +267,27 @@ class Lesson extends Component {
   }
 
   beginInfinityLesson = (activityTypes, clef) => {
+    this.props.registerClick('InitialBeginButton');
     this.props.getRandomLesson(this.props.history, activityTypes, clef);
     this.setState({ intro: false });
   }
 
   goToNextFromResultsPage = () => {
+    console.log('go to next stuff: ', this.props.correctness);
+    if (this.props.correctness.affectPercent !== -1 && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1) {
+      this.props.submitAttempt(
+        this.props.correctness.id,
+        this.state.currentPage - 1,
+        this.state.attempt,
+        this.props.correctness.accuracyPercent,
+        this.props.correctness.accuracyArray,
+        this.props.correctness.errorPercent,
+        this.props.correctness.errorArray,
+        this.props.correctness.affectPercent,
+        this.props.correctness.affectDataframe,
+        this.state.bpm,
+      );
+    }
     const result = this.determineResultType();
     if (result === 'continue') {
       this.setState((prevState) => ({ currentPage: prevState.currentPage + 1, attempt: 0, halfSpeed: false }));
@@ -277,7 +298,7 @@ class Lesson extends Component {
     }
     this.setState({ determiningCompletion: false, pagesCompleted: false });
     this.props.resetAllCorrectness();
-    if (this.props.timerFinished || this.state.currentPage >= 20) {
+    if (this.props.timerFinished || this.state.currentPage >= 17) {
       this.setState({ proceedToEnd: true });
       this.props.expireManually();
     }
@@ -328,14 +349,19 @@ class Lesson extends Component {
   }
 
   render() {
-    if (this.state.currentPage > 20 || this.state.proceedToEnd) {
+    if (this.state.currentPage > 17 || this.state.proceedToEnd) {
       return (
         <div className="infinity">
           <div className="infinity-body rt-results-page">
-            <div className="rt-intro-text">
-              This is the end of the activities. Your payment string is {this.props.correctness.string}.
-              Please make sure to submit the Qualtrics survey as the final piece of this experiment.
-              Thank you for your time!
+            <div className="infinity-final-rt">
+              <div className="infinity-final-rt-text"> This is the end of the activities. Your payment string is {this.props.correctness.string}. </div>
+              <br />
+              <div className="infinity-final-rt-text">Please submit the original survey.</div>
+              <br />
+              <div className="infinity-final-rt-text"> NOW, PLEASE FILL OUT THIS VERY BRIEF EXIT SURVEY. YOU WILL NOT BE PAID IF YOU DO NOT FILL OUT THE EXIT SURVEY:</div>
+              <a className="infinity-final-rt-text" href="https://dartmouth.co1.qualtrics.com/jfe/form/SV_9oQEgX4NOEMgKge">https://dartmouth.co1.qualtrics.com/jfe/form/SV_9oQEgX4NOEMgKge</a>
+
+              <div className="infinity-final-rt-text"> You can then close this tab.</div>
             </div>
           </div>
         </div>
@@ -393,7 +419,7 @@ class Lesson extends Component {
           </div>
         );
         ///  NEED TO CHANGE FOR REAL: should be facialAffect !== -1 for face condition
-      } else if (this.state.determiningCompletion && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1) {
+      } else if (this.state.determiningCompletion && this.props.correctness.errorPercent !== -1 && this.props.correctness.accuracyPercent !== -1 && this.props.correctness.affectPercent !== -1) {
         return (
           <div className="infinity">
             <div className="infinity-body rt-results-page">
@@ -420,8 +446,14 @@ class Lesson extends Component {
       } else if (this.state.determiningCompletion && this.props.correctness.affectPercent === -1) {
         return (
           <div className="infinity">
-            <div className="infinity-body rt-results-page">
+            <div className="infinity-body rt-results-page flex-center-rt">
               <div className="infinity-title infinity-title-top">Calculating Results...do NOT refresh!</div>
+              <div className="rt-lesson-text-1">This may take up to one minute to process. Please wait!</div>
+              <Dots id="loading-dots"
+                dotColors={['red', 'white', 'blue', '#123abc', 'rgb(50,50,50)',
+                  'hsla(235, 100%, 50%, .5)']}
+                text="Loading...please wait!"
+              />
             </div>
           </div>
         );
@@ -462,5 +494,6 @@ export default withRouter(connect(mapStateToProps, {
   assignCoins,
   getAccuracyPercentAndErrorPercent,
   resetAllCorrectness,
-  createNewAttempt,
+  submitAttempt,
+  registerClick,
 })(Lesson));

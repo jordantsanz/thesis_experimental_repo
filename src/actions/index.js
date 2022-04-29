@@ -1,3 +1,4 @@
+/* eslint-disable no-eval */
 /* eslint-disable camelcase */
 /* eslint-disable no-param-reassign */
 /* eslint-disable eqeqeq */
@@ -12,7 +13,7 @@ import premadeLessons from '../lib/PremadeLessons';
 const ROOT_URL = '';
 // url for face detection
 // LOCAL:
-// const VIDEO_URL = 'http://127.0.0.1:8000';
+// const VIDEO_URL = 'http://127.0.0.1:8080';
 // PROD:
 // const VIDEO_URL = 'https://thesis-backend-jsanz.onrender.com';
 // url for database
@@ -21,7 +22,6 @@ const VIDEO_URL = 'https://jsanz-thesis-new-backend-2rfzh6lqca-uk.a.run.app';
 
 // LOCAL:
 // const ROOT_URL_DATABASE = 'http://localhost:9090/api';
-// const ROOT_URL_DATABASE_VIDEOUPLOAD = 'http://localhost:9090';
 // PROD:
 const ROOT_URL_DATABASE = 'https://jsanz-thesis-database.herokuapp.com/api';
 const ROOT_URL_DATABASE_VIDEOUPLOAD = 'https://jsanz-thesis-database.herokuapp.com';
@@ -91,35 +91,110 @@ export function makeContentPage(lessonid, fields) {
   });
 }
 
+export function failed() {
+  console.log('failed');
+  return ((dispatch) => {
+    console.log('dispatching');
+    dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: -2, affectDataframe: {} } });
+  });
+}
+
+// function parseResponse(data) {
+//   const json = JSON.stringify(data);
+//   console.log('string json: ', json);
+//   const parseJson = JSON.parse(json);
+//   console.log('parse json: ', parseJson);
+//   const { raw, means } = parseJson;
+//   // eslint-disable-next-line guard-for-in
+//   for (const k in parseJson) {
+//     console.log('key: ', k);
+//   }
+//   console.log('raw and means: ', raw, means);
+
+//   const {
+//     anger, sadness, fear, disgust, neutral, happiness,
+//   } = JSON.parse(JSON.stringify(raw));
+//   const angerR = anger;
+//   const sadnessR = sadness;
+//   const fearR = fear;
+//   const disgustR = disgust;
+//   const neutralR = neutral;
+//   const happinessR = happiness;
+
+//   console.log('emotions: ', angerR, sadnessR, fearR, disgustR, neutralR, happinessR);
+
+//   const parseMeans = JSON.parse(JSON.stringify(means));
+//   const angerM = parseMeans.anger;
+//   const sadnessM = parseMeans.sadness;
+//   const fearM = parseMeans.fear;
+//   const disgustM = parseMeans.disgust;
+//   const neutralM = parseMeans.neutral;
+//   const happinessM = parseMeans.happiness;
+
+//   console.log('means: ', angerM, sadnessM, fearM, disgustM, neutralM, happinessM);
+
+//   const finalJson = {
+//     raw: {
+//       anger: angerR,
+//       sadness: sadnessR,
+//       fear: fearR,
+//       disgust: disgustR,
+//       neutral: neutralR,
+//       happiness: happinessR,
+//     },
+//     means: {
+//       anger: angerM,
+//       sadness: sadnessM,
+//       fear: fearM,
+//       disgust: disgustM,
+//       neutral: neutralM,
+//       happiness: happinessM,
+//     },
+//   };
+//   console.log('final JSON: ', finalJson);
+//   return finalJson;
+// }
+
+export function registerClick(clickType) {
+  return ((dispatch) => {
+    console.log('register click');
+    axios.post(`${ROOT_URL_DATABASE}/click`, { clickType })
+      .then((res) => {
+        console.log('response from click: ', res);
+      })
+
+      .catch((err) => {
+        console.log('error doing click call: ', err);
+      });
+  });
+}
+
 export function sendVideo(video, id, lesson_id, attempt) {
   console.log('actions send video', id);
-  // const vid = getVideoElementVersion(video);
-  // console.log('vid', vid);
-  // console.log('video', video);
-  // const vidElement = document.createElement('video');
-  // vidElement.src = video;
-  // console.log('render static', renderToStaticMarkup(vid));
-  // console.log('vidElement', vidElement);
-  // analyzeVid('the-real-vid');
   return ((dispatch) => {
     const formData = new FormData();
     formData.append('video', video);
     console.log(video, 'video');
     console.log('sending video');
-    axios.post(`${VIDEO_URL}/video`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then((res) => {
-      console.log('response received from video send', res);
-      const percent = calculateAffectPercent(res.data);
-      axios.put(`${ROOT_URL_DATABASE}/affect`, {
-        percent, id, lesson_id, attempt, dataframe: res.data,
-      }).then((res2) => {
-        console.log('res 2 from affect:', res2);
-        dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent } });
+    try {
+      axios.post(`${VIDEO_URL}/video`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }).then((res) => {
+        console.log('res data', res.data);
+        registerClick('videoResultsReturned');
+        const percent = calculateAffectPercent(res.data);
+        // axios.put(`${ROOT_URL_DATABASE}/createAttempt`, {
+        //   percent, id, lesson_id, attempt, dataframe: res.data,
+        // }).then((res2) => {
+        //   console.log('res 2 from affect:', res2);
+        dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: percent, affectDataframe: res.data } });
       });
-    });
+    } catch {
+      console.log('dispatching');
+      dispatch({ type: ActionTypes.GET_AFFECT, payload: { affectPercent: -2, affectDataframe: {} } });
+    }
   });
 }
 
@@ -154,7 +229,7 @@ export function submitFinalTimeResults(id, timerStats, stopwatchStats, string) {
 }
 
 export function setUserHash(hash) {
-  axios.post(`${ROOT_URL_DATABASE}/newSubject`, { id: hash });
+  axios.post(`${ROOT_URL_DATABASE}/newSubject`, { id: hash, isControl: true });
   return ((dispatch) => {
     dispatch({ type: ActionTypes.SET_USER_HASH, payload: { id: hash, isControl: true } });
   });
@@ -163,9 +238,9 @@ export function setUserHash(hash) {
 export function createNewAttempt(id, lesson_id, attempt, bpm) {
   return ((dispatch) => {
     console.log('create new attempt');
-    axios.post(`${ROOT_URL_DATABASE}/newattempt`, {
-      id, lesson_id, attempt, bpm,
-    });
+    // axios.post(`${ROOT_URL_DATABASE}/newattempt`, {
+    //   id, lesson_id, attempt, bpm,
+    // });
   });
 }
 
@@ -188,17 +263,42 @@ export function getErrorPercent(errorArray, id, lesson_id, attempt) {
   });
 }
 
+export function submitAttempt(userId, lesson_id, attempt, accuracyPercent, accuracyArray, errorPercent, errorArray, affectPercent, affectDataframe, bpm) {
+  console.log('before dispatch submit: ', accuracyPercent, accuracyArray, errorPercent, errorArray, affectDataframe, affectPercent);
+  return ((dispatch) => {
+    console.log('submit attempt called');
+    axios.post(`${ROOT_URL_DATABASE}/submitattempt`,
+      {
+        id: userId,
+        lesson_id,
+        attempt,
+        accuracyPercent,
+        accuracyArray,
+        errorPercent,
+        errorArray,
+        affectPercent,
+        affectDataframe,
+        bpm,
+      });
+  });
+}
+
 export function getAccuracyPercentAndErrorPercent(accuracyArray, errorArray, id, lesson_id, attempt) {
   console.log('get accuracy in actions', id);
   const percent = calculateAccuracyPercent(accuracyArray);
   const errorPercent = calculateErrorPercent(errorArray);
 
-  axios.put(`${ROOT_URL_DATABASE}/percents`, {
-    percent, errorPercent, id, lesson_id, attempt, errorArray, accuracyArray,
-  });
+  // axios.put(`${ROOT_URL_DATABASE}/percents`, {
+  //   percent, errorPercent, id, lesson_id, attempt, errorArray, accuracyArray,
+  // });
   return ((dispatch) => {
     console.log('dispatch accuracy');
-    dispatch({ type: ActionTypes.GET_ACCURACY_AND_ERROR_PERCENT, payload: { accuracyPercent: percent, errorPercent } });
+    dispatch({
+      type: ActionTypes.GET_ACCURACY_AND_ERROR_PERCENT,
+      payload: {
+        accuracyPercent: percent, errorPercent, accuracyArray, errorArray,
+      },
+    });
   });
 }
 

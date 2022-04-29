@@ -1,6 +1,8 @@
 /* eslint-disable react/no-unused-state */
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Timer from 'tiny-timer';
+import { registerClick } from '../actions';
 import VexNotes from './Vex';
 import metronomeSound from '../../sounds/metronomeSound.wav';
 import bassDrum from '../../sounds/bassDrum.mp3';
@@ -100,10 +102,13 @@ class RhythmNew extends Component {
     const beatsPerSecond = this.props.bpm / 60;
     const millisecondsPerBeat = this.calculateMetronomeHitInterval(beatsPerSecond);
     const correctKey = this.props.keys[this.state.currNote];
-    const correctTime = this.state.curNoteTimeHits[this.state.currNote] - millisecondsPerBeat;
+    const correctTime = this.state.curNoteTimeHits[this.state.colorsArray.length - 1] - millisecondsPerBeat;
+    console.log('correct time: ', correctTime);
     const { colorsArray, errorArray, accuracyArray } = this.state;
 
-    if (colorsArray.length >= this.state.vexNotes.length) {
+    console.log('processed and correct: ', processedTime, correctTime);
+
+    if (colorsArray.length > this.state.vexNotes.length) {
       return;
     }
 
@@ -113,13 +118,23 @@ class RhythmNew extends Component {
     if (processedTime == null) {
       console.log('processed time is null: ', processedTime);
     }
-    const error = Math.abs(correctTime - processedTime);
+    let error = Math.abs(correctTime - processedTime);
+    console.log('error: ', error);
     if (error == null) {
       console.log('error is null: ', error);
+    }
+    if (Number.isNaN(error)) {
+      console.log('is nan: ', error);
+      console.log('correct and precessoed: ', correctTime, processedTime);
+    }
+    if (error > 500) {
+      console.log('error now above 400');
+      error = 500;
     }
     const pressedCorrectKey = correctKey === key;
 
     if (colorsArray[this.state.currNote] !== 'red') {
+      console.log('not red');
       if (errorArray.length < this.state.vexNotes.length) {
         errorArray.push(error);
         console.log('error array: ', errorArray);
@@ -129,27 +144,51 @@ class RhythmNew extends Component {
     }
 
     // if not a valid hit
+    console.log('before huge switch statement');
     if (colorsArray[this.state.currNote] === 'red') {
       console.log('already hit this note, too early on next');
+      console.log('made red in too early block');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray.push('red');
       errorArray.push(error);
       console.log('error array: ', errorArray);
       console.log('colors array: ', colorsArray);
     } else if (colorsArray[this.state.currNote] === 'green') {
       console.log('already hit this note, too early on next');
+      console.log('made red in already green block');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray.push('red');
     } else if (!this.state.validHit) {
       console.log('not valid hit');
+      console.log('made red in not valid hit block');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray[this.state.currNote] = 'red';
     } else if (error > 399) {
       console.log('error too high');
       console.log('error: ', error);
+      console.log('made red in error too high block');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray[this.state.currNote] = 'red';
     } else if (!pressedCorrectKey) {
       console.log('did not press correct key;0');
+      console.log('made red in pressed correct key block');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray[this.state.currNote] = 'red';
     } else {
       console.log('correct hit');
+      if (colorsArray.length >= this.state.vexNotes.length) {
+        return;
+      }
       colorsArray[this.state.currNote] = 'green';
       accuracyArray[this.state.currNote] = 1;
     }
@@ -199,11 +238,11 @@ class RhythmNew extends Component {
     timer.on('tick', (ms) => {
       if (this.state.checkpoints.has(Math.round(ms / 100) * 100)) {
         const checkpoint = this.state.checkpoints.get(Math.round(ms / 100) * 100);
-        this.handleCheckpoint(checkpoint.info.isMetronome, checkpoint.info.isCurNote, checkpoint.info.isValidNote, checkpoint.time);
+        this.handleCheckpoint(checkpoint.info.isMetronome, checkpoint.info.isCurNote, checkpoint.info.isValidNote, checkpoint.time, checkpoint.curNoteVal);
       }
-      if (ms >= this.state.maxKey && !this.state.foundFinal) {
+      if (ms >= this.state.maxKey + 1000 && !this.state.foundFinal) {
         const check = this.state.checkpoints.get(this.state.maxKey);
-        this.handleCheckpoint(check.info.isMetronome, check.info.isCurNote, check.info.isValidNote, check.time);
+        this.handleCheckpoint(check.info.isMetronome, check.info.isCurNote, check.info.isValidNote, check.time, check.curNoteVal);
         this.setState({ foundFinal: true });
       }
     });
@@ -215,7 +254,9 @@ class RhythmNew extends Component {
 
     // build times that each metronome is hit
     const metronomeHitTimes = [0, introTime * 1, introTime * 2, introTime * 3];
-    for (let i = 0; i < 48; i += 1) {
+    const metronomeCount = this.props.lesson_id === 0 ? 16 : 48;
+    console.log('lessonid: ', this.props.lesson_id, metronomeCount);
+    for (let i = 0; i < metronomeCount; i += 1) {
       metronomeHitTimes.push((i * millisecondsPerBeat) + introTime * 4);
     }
 
@@ -283,6 +324,7 @@ class RhythmNew extends Component {
               isCurNote: false,
               isValidNote: false,
             },
+            curNoteVal: -1,
           };
           checkpointsDict.set(metronomeVal, checkpointEntry);
         }
@@ -293,6 +335,7 @@ class RhythmNew extends Component {
         // if (checkpointsDict !== undefined && lastCheckpointEntry.time === curNoteVal) {
         if (checkpointsDict.has(curNoteVal)) {
           checkpointsDict.get(curNoteVal).info.isCurNote = true;
+          checkpointsDict.get(curNoteVal).curNoteVal = curNoteIndex;
         } else {
           const checkpointEntry = {
             time: curNoteVal,
@@ -301,6 +344,7 @@ class RhythmNew extends Component {
               isCurNote: true,
               isValidNote: false,
             },
+            curNoteVal: curNoteIndex,
           };
           checkpointsDict.set(curNoteVal, checkpointEntry);
         }
@@ -318,6 +362,7 @@ class RhythmNew extends Component {
               isCurNote: false,
               isValidNote: true,
             },
+            curNoteVal: -1,
           };
           checkpointsDict.set(validNoteVal, checkpointEntry);
         }
@@ -331,18 +376,13 @@ class RhythmNew extends Component {
         maxKey = keys[i];
       }
     }
+    console.log('checkpoints: ', checkpointsDict);
     this.setState({ checkpoints: checkpointsDict, maxKey });
   }
 
   calculateMetronomeHitInterval = (beatsPerSecond) => {
     const millisecondsPerBeat = 1000 / beatsPerSecond;
     return millisecondsPerBeat;
-  }
-
-  playMetronomeSound = () => {
-    this.state.metronomeAudio.volume = 0.3;
-    // this.state.metronomeAudio.pause();
-    this.state.metronomeAudio.play();
   }
 
   convertNoteCodeToMilliseconds = (duration, beatsPerSecond) => {
@@ -360,49 +400,48 @@ class RhythmNew extends Component {
     return durationInSeconds * 1000;
   }
 
-  handleCheckpoint = (isMetronome, isCurNote, isValidNote, time) => {
-    if (time === this.state.maxKey) {
-      if (this.state.userAttempting) {
-        this.props.registerCompletion(this.state.errorArray, this.state.colorsArray);
-        this.props.stopRecording();
-        this.props.stopStopwatch();
-        this.setState({ success: true, userAttempting: false });
-      } else {
-        this.setState({
-          userAttempting: false, listening: false, colorsArray: [], accuracyArray: [], errorArray: [],
-        });
-      }
-    }
-    if (isMetronome) {
-      // console.log('is play metronome sound');
+  handleCheckpoint = (isMetronome, isCurNote, isValidNote, time, curNoteVal) => {
+    console.log(curNoteVal, 'curNoteVal');
+    if (isMetronome && (!isCurNote || !this.state.listening)) {
       this.state.metronomeAudio.volume = 0.3;
-      // this.state.metronomeAudio.pause();
       this.state.metronomeAudio.play();
+      this.startCountdown(4);
+    }
+
+    if (isMetronome && isCurNote && this.state.countDownNumber === 1) {
       this.startCountdown(4);
     }
     // current note checkpoint
     if (isCurNote) {
+      console.log('is cur Note: ', isCurNote);
+      console.log('this state curnote: ', this.state.currNote);
       const { colorsArray, errorArray, accuracyArray } = this.state;
       if (colorsArray.length > 0 && colorsArray[colorsArray.length - 1] === 'blue') {
+        console.log('made red in colors array length and is blue');
+        if (colorsArray.length >= this.state.vexNotes.length) {
+          return;
+        }
         colorsArray[this.state.currNote] = this.state.listening ? 'green' : 'red';
-        errorArray[this.state.currNote] = 400;
+        errorArray[this.state.currNote] = 500;
         accuracyArray[this.state.currNote] = 0;
       }
       if (colorsArray[this.state.currNote + 1] === 'red') {
         console.log('already answered too early');
       } else {
+        if (colorsArray.length >= this.state.vexNotes.length) {
+          return;
+        }
         colorsArray[this.state.currNote + 1] = this.state.listening ? 'green' : 'blue';
       }
 
       if (this.state.listening) {
         const key = this.props.keys[colorsArray.length - 1];
-        // console.log('key: ', key);
         this.highlightAndPlaySound(key);
       }
       this.setState((prevState) => {
         return (
           {
-            currNote: prevState.currNote + 1,
+            currNote: curNoteVal,
             lastCurNoteCheckpoint: time,
             validHit: true,
             colorsArray,
@@ -413,15 +452,35 @@ class RhythmNew extends Component {
     }
     // handle valid note checkpoint
     if (isValidNote) {
+      console.log('is valid note: ', isValidNote);
       this.setState({ validHit: false });
       const { colorsArray, errorArray, accuracyArray } = this.state;
       if (colorsArray[this.state.currNote] === 'blue') {
         if (!this.state.listening) {
+          console.log('made red in not listening block');
+          if (colorsArray.length >= this.state.vexNotes.length) {
+            return;
+          }
           colorsArray[this.state.currNote] = 'red';
-          errorArray[this.state.currNote] = 400;
+          errorArray[this.state.currNote] = 500;
           accuracyArray[this.state.currNote] = 0;
         }
         this.setState({ colorsArray, rerender: true });
+      }
+    }
+
+    if (time === this.state.maxKey) {
+      if (this.state.userAttempting) {
+        console.log('final: ', this.state.errorArray, this.state.colorsArray);
+        this.props.registerCompletion(this.state.errorArray, this.state.colorsArray);
+        this.props.stopRecording();
+        this.props.stopStopwatch();
+        this.setState({ success: true, userAttempting: false, rerender: true });
+      } else {
+        console.log('finished listening');
+        this.setState({
+          userAttempting: false, listening: false, colorsArray: [], accuracyArray: [], errorArray: [],
+        });
       }
     }
 
@@ -476,6 +535,7 @@ class RhythmNew extends Component {
   }
 
   playAnswer = () => {
+    this.props.registerClick('listeningClick');
     this.setState({
       playing: true, foundFinal: false, listening: true, rerender: true,
     });
@@ -505,20 +565,36 @@ class RhythmNew extends Component {
   }
 
   attemptExercise = () => {
+    this.props.registerClick('attemptExercise');
     this.props.startRecording();
     this.props.startStopwatch();
+    const beatsPerSecond = this.props.bpm / 60;
+    const millisecondsPerBeat = this.calculateMetronomeHitInterval(beatsPerSecond);
     this.setState({
-      userAttempting: true, listening: false, clickTimes: [], keyPresses: [], rerender: true, correctnessArray: [], curMeasure: 0, colorsArray: [], foundFinal: false,
+      userAttempting: true,
+      listening: false,
+      clickTimes: [],
+      keyPresses: [],
+      rerender: true,
+      correctnessArray: [],
+      curMeasure: 0,
+      colorsArray: [],
+      errorArray: [],
+      accuracyArray: [],
+      foundFinal: false,
+      currNote: -1,
+      validHit: false,
+      lastCurNoteCheckpoint: 0,
+      countDownNumber: null,
     });
     this.props.makeNewAttempt(this.props.bpm);
     this.state.timer.stop();
     this.state.timer.start(100000);
-    const beatsPerSecond = this.props.bpm / 60;
-    const millisecondsPerBeat = this.calculateMetronomeHitInterval(beatsPerSecond);
     this.calculateBaselineTimes(millisecondsPerBeat);
   }
 
   stopListening = () => {
+    this.props.registerClick('cancelListen');
     this.setState({
       listening: false,
       colorsArray: [],
@@ -632,4 +708,4 @@ class RhythmNew extends Component {
     );
   }
 }
-export default RhythmNew;
+export default connect(null, { registerClick })(RhythmNew);

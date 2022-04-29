@@ -62,11 +62,17 @@ export const calculateErrorPercent = (errorArray) => {
 };
 
 export const calculateAffectPercent = (affectDict) => {
+  const negativeDict = {
+    sadness: affectDict.sadness,
+    anger: affectDict.anger,
+    disgust: affectDict.disgust,
+    fear: affectDict.fear,
+  };
   console.log('calcuate affect percent ');
   const {
     NO_NEGATIVE_AFFECT_PERCENT, NO_NEGATIVE_AFFECT_UPPER_BOUND, PARTIAL_NEGATIVE_AFFECT_PERCENT, PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND, MAJOR_NEGATIVE_AFFECT_PERCENT,
   } = affectPercentRanges;
-  const sum = Object.values(affectDict).reduce((a, b) => a + b);
+  const sum = Object.values(negativeDict).reduce((a, b) => a + b);
   console.log(sum);
   const percent = sum;
   if (percent <= NO_NEGATIVE_AFFECT_UPPER_BOUND) {
