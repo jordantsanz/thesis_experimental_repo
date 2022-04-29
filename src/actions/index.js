@@ -5,7 +5,6 @@
 import axios from 'axios';
 
 // import { generateRhythmActivity } from '../components/Random';
-import { FALSE } from 'node-sass';
 import { calculateAccuracyPercent, calculateErrorPercent, calculateAffectPercent } from './CalculatePercentages';
 import premadeLessons from '../lib/PremadeLessons';
 // import { renderToStaticMarkup } from 'react-dom/server';
