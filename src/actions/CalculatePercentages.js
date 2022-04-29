@@ -77,7 +77,7 @@ export const calculateAffectPercent = (affectDict) => {
   const percent = sum;
   if (percent <= NO_NEGATIVE_AFFECT_UPPER_BOUND) {
     return NO_NEGATIVE_AFFECT_PERCENT;
-  } else if (percent > PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND) {
+  } else if (percent < PARTIAL_NEGATIVE_AFFECT_UPPER_BOUND) {
     return PARTIAL_NEGATIVE_AFFECT_PERCENT;
   } else {
     return MAJOR_NEGATIVE_AFFECT_PERCENT;
