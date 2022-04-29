@@ -103,7 +103,6 @@ class RhythmNew extends Component {
     const millisecondsPerBeat = this.calculateMetronomeHitInterval(beatsPerSecond);
     const correctKey = this.props.keys[this.state.currNote];
     const correctTime = this.state.curNoteTimeHits[this.state.colorsArray.length - 1] - millisecondsPerBeat;
-    console.log('correct time: ', correctTime);
     const { colorsArray, errorArray, accuracyArray } = this.state;
 
     console.log('processed and correct: ', processedTime, correctTime);
@@ -398,7 +397,6 @@ class RhythmNew extends Component {
   }
 
   handleCheckpoint = (isMetronome, isCurNote, isValidNote, time, curNoteVal) => {
-    console.log(curNoteVal, 'curNoteVal');
     if (isMetronome && (!isCurNote || !this.state.listening)) {
       this.state.metronomeAudio.volume = 0.3;
       this.state.metronomeAudio.play();
@@ -410,8 +408,6 @@ class RhythmNew extends Component {
     }
     // current note checkpoint
     if (isCurNote) {
-      console.log('is cur Note: ', isCurNote);
-      console.log('this state curnote: ', this.state.currNote);
       const { colorsArray, errorArray, accuracyArray } = this.state;
       if (colorsArray.length > 0 && colorsArray[colorsArray.length - 1] === 'blue') {
         console.log('made red in colors array length and is blue');

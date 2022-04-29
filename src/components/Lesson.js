@@ -306,9 +306,9 @@ class Lesson extends Component {
 
   determineResult = () => {
     // ! Use this for facial affect version
-    // const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.affectPercent + this.props.correctness.accuracyPercent) / 3;
+    const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.affectPercent + this.props.correctness.accuracyPercent) / 3;
 
-    const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.accuracyPercent) / 2;
+    // const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.accuracyPercent) / 2;
     if (avgPercent <= resultPercentRanges.REPEAT_SLOWER_BOUND) {
       return 'Repeat again, but slower this time.';
     } else if (avgPercent <= resultPercentRanges.REPEAT_SAME_BOUND) {
@@ -320,8 +320,8 @@ class Lesson extends Component {
 
   determineResultType = () => {
     // ! Use this for facial affect version
-    // const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.affectPercent + this.props.correctness.accuracyPercent) / 3;
-    const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.accuracyPercent) / 2;
+    const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.affectPercent + this.props.correctness.accuracyPercent) / 3;
+    // const avgPercent = (this.props.correctness.errorPercent + this.props.correctness.accuracyPercent) / 2;
     if (avgPercent <= resultPercentRanges.REPEAT_SLOWER_BOUND) {
       return 'repeat_slower';
     } else if (avgPercent <= resultPercentRanges.REPEAT_SAME_BOUND) {
@@ -429,7 +429,7 @@ class Lesson extends Component {
                 <br />
                 <li className="rt-result">Accuracy Percent: {this.determineResultWord(this.props.correctness.accuracyPercent)} </li>
                 <br />
-                {/* <li className="rt-result">Affect Percent: {this.props.correctness.affectPercent} </li> */}
+                <li className="rt-result">Affect Percent: {this.determineResultWord(this.props.correctness.affectPercent)} </li>
                 <br />
                 <br />
                 <br />
