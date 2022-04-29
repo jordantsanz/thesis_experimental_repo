@@ -5,6 +5,7 @@
 import axios from 'axios';
 
 // import { generateRhythmActivity } from '../components/Random';
+import { FALSE } from 'node-sass';
 import { calculateAccuracyPercent, calculateErrorPercent, calculateAffectPercent } from './CalculatePercentages';
 import premadeLessons from '../lib/PremadeLessons';
 // import { renderToStaticMarkup } from 'react-dom/server';
@@ -229,9 +230,9 @@ export function submitFinalTimeResults(id, timerStats, stopwatchStats, string) {
 }
 
 export function setUserHash(hash) {
-  axios.post(`${ROOT_URL_DATABASE}/newSubject`, { id: hash, isControl: true });
+  axios.post(`${ROOT_URL_DATABASE}/newSubject`, { id: hash, isControl: false });
   return ((dispatch) => {
-    dispatch({ type: ActionTypes.SET_USER_HASH, payload: { id: hash, isControl: true } });
+    dispatch({ type: ActionTypes.SET_USER_HASH, payload: { id: hash, isControl: false } });
   });
 }
 
