@@ -359,7 +359,7 @@ class Lesson extends Component {
               <div className="infinity-final-rt-text">Please submit the original survey.</div>
               <br />
               <div className="infinity-final-rt-text"> NOW, PLEASE FILL OUT THIS VERY BRIEF EXIT SURVEY. YOU WILL NOT BE PAID IF YOU DO NOT FILL OUT THE EXIT SURVEY:</div>
-              <a className="infinity-final-rt-text" href="https://dartmouth.co1.qualtrics.com/jfe/form/SV_bmwFwCNtmlZLXeu">https://dartmouth.co1.qualtrics.com/jfe/form/SV_bmwFwCNtmlZLXeu</a>
+              <a className="infinity-final-rt-text" href="https://dartmouth.co1.qualtrics.com/jfe/form/SV_ebQoJdS9KadYJEi">https://dartmouth.co1.qualtrics.com/jfe/form/SV_ebQoJdS9KadYJEi</a>
 
               <div className="infinity-final-rt-text"> You can then close this tab.</div>
             </div>
