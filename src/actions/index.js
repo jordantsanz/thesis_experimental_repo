@@ -703,16 +703,7 @@ export function registerLessonCompletion(lessonID, userID) {
   };
 }
 
-export function getRandomLesson(history, types, clef) {
-  // call createRandomActivity 100 times and store in []
-  // console.log('getRandomLesson called');
-  // const arr = [];
-  // for (let i = 0; i < 100; i += 1) {
-  //   arr.push(generateRhythmActivity(i, 'easy'));
-  // }
-  // const json = { pages: arr, title: 'random' };
-  // console.log('json created,', json);
-
+export function getRhythmLesson() {
   const arr2 = premadeLessons;
   console.log({ arr2 });
   const json = { pages: arr2, title: 'random' };

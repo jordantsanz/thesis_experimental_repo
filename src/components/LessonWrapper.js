@@ -13,8 +13,6 @@ const LessonWrapper = () => {
   const {
     start, pause, seconds, minutes,
   } = useStopwatch({ autoStart: false });
-  // eslint-disable-next-line no-unused-vars
-  const [stopwatch, setStopwatch] = useState(null);
   expiryTimestamp.setMinutes(expiryTimestamp.getMinutes() + 35);
   const timer = useTimer({
     expiryTimestamp,

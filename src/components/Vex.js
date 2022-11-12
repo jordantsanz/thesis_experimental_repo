@@ -90,20 +90,6 @@ class VexNotes extends Component {
             note.setStyle({ fillStyle: this.props.colorsArray[noteCount], strokeStyle: this.props.colorsArray[noteCount] });
           }
           noteCount += 1;
-
-          // if (!this.isRest(note)) {
-          //   // if (this.props.correctnessArray.length >= noteCount) {
-          //   if (this.props.correctnessArray[noteCount] === 1) {
-          //     note.setStyle({ fillStyle: 'green', strokeStyle: 'green' });
-          //   } else if (this.props.correctnessArray[noteCount] === 0) {
-          //     note.setStyle({ fillStyle: 'red', strokeStyle: 'red' });
-          //   }
-          //   // }
-          //   if (this.props.lightBlueArray.length === noteCount + 1) {
-          //     note.setStyle({ fillStyle: 'blue', strokeStyle: 'blue' });
-          //   }
-          //   noteCount += 1;
-          // }
         }
       }
     }

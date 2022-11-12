@@ -1,25 +1,20 @@
-/* eslint-disable import/no-named-as-default-member */
 import React from 'react';
 import {
   BrowserRouter as Router, Route, Switch,
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { getUserInfo, setUserMTurkID } from '../actions';
-// import RhythmWrapper from './RhythmWrapper';
 import LessonWrapper from './LessonWrapper';
-// import Start from './Start';
 
 const App = (props) => {
-  // const token = localStorage.getItem('token');
-
   window.onbeforeunload = (event) => {
     const e = event || window.event;
     // Cancel the event
     e.preventDefault();
     if (e) {
-      e.returnValue = ''; // Legacy method for cross browser support
+      e.returnValue = '';
     }
-    return ''; // Legacy method for cross browser support
+    return '';
   };
 
   const id = window.location.pathname;
@@ -28,6 +23,7 @@ const App = (props) => {
   console.log('id without slash: ', idWithoutSlash);
   const idToken = localStorage.getItem('mturk');
   setUserMTurkID(idWithoutSlash);
+
   if (idToken && props.user.username === null) {
     console.log(localStorage);
     props.getUserInfo();
