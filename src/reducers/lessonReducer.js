@@ -5,7 +5,6 @@ const initialState = {
 };
 
 const lessonReducer = (state = initialState, action) => {
-  console.log('in lesson reducer', action.type, action.payload);
   switch (action.type) {
     case ActionTypes.GET_LESSONS:
       return {
